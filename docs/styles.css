@@ -75,6 +75,32 @@ body {
 .status .next { margin-top: 6px; font-size: 15px; color: var(--white); }
 .status .next b { color: var(--yellow); font-weight: 700; }
 .status .to-coast { margin-top: 2px; font-size: 13px; color: var(--purple-300); }
+.status .tap-hint { margin-top: 10px; font-size: 12px; color: var(--purple-300); }
+
+.pin-hit { cursor: pointer; outline: none; }
+.pin-hit:focus-visible { stroke: var(--yellow); stroke-width: 2.5; }
+
+.loc-card {
+  position: fixed; z-index: 45; display: none;
+  max-width: 264px; background: var(--white); color: var(--ink);
+  border-radius: var(--radius-card); box-shadow: 0 10px 30px rgba(39,0,75,0.35);
+  padding: 14px 16px 16px; font-size: 14px; line-height: 1.45;
+}
+.loc-card.show { display: block; }
+.loc-close {
+  position: absolute; top: 4px; right: 8px; border: none; background: none;
+  font-size: 22px; line-height: 1; color: var(--purple-300); cursor: pointer;
+}
+.loc-status { font-size: 12px; font-weight: 700; margin-bottom: 4px; padding-right: 16px; }
+.loc-status.is-reached { color: var(--purple-600); }
+.loc-status.is-ahead { color: var(--ink); opacity: 0.55; }
+.loc-title { margin: 0 0 8px; font-size: 17px; font-weight: 700; color: var(--purple); }
+.loc-sor {
+  display: none; font-size: 11px; font-weight: 700;
+  background: var(--blue); color: var(--purple);
+  padding: 3px 9px; border-radius: var(--radius-pill); margin-bottom: 8px;
+}
+.loc-note { margin: 0; color: var(--ink); }
 
 #view-log { padding: 18px 16px 24px; }
 .card {

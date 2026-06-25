@@ -11,6 +11,7 @@
   var unit = 'miles';
   var selectedDate = todayStr_();
   var editingId = null;
+  var locSticky_ = false;
 
   function api(method) {
     var args = Array.prototype.slice.call(arguments, 1);
@@ -43,9 +44,12 @@
     updateConversion_();
   }
 
+  var SVGNS = 'http://www.w3.org/2000/svg';
+
   function renderMap_() {
     var path = document.getElementById('route-full');
     if (!path || !path.getTotalLength) return;
+    hideLocCard_();
     var L = path.getTotalLength();
     var goal = STATE.config.goalMiles;
     var total = STATE.progress.totalMiles;
@@ -57,16 +61,34 @@
       var pt = path.getPointAtLength(f * L);
       var reached = r.cumulativeMiles <= total;
       var big = (r.order === 1 || r.cumulativeMiles >= goal);
-      var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      var c = document.createElementNS(SVGNS, 'circle');
       c.setAttribute('cx', pt.x.toFixed(1));
       c.setAttribute('cy', pt.y.toFixed(1));
       c.setAttribute('r', big ? 6.5 : 5);
       c.setAttribute('class', 'pin ' + (reached ? ('pin-' + (r.sorTag || 'literary')) : 'pin-unreached'));
       c.setAttribute('data-city', r.city);
-      var title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-      title.textContent = r.city;
-      c.appendChild(title);
       g.appendChild(c);
+
+      var hit = document.createElementNS(SVGNS, 'circle');
+      hit.setAttribute('cx', pt.x.toFixed(1));
+      hit.setAttribute('cy', pt.y.toFixed(1));
+      hit.setAttribute('r', 16);
+      hit.setAttribute('fill', 'transparent');
+      hit.setAttribute('class', 'pin-hit');
+      hit.setAttribute('tabindex', '0');
+      hit.setAttribute('role', 'button');
+      hit.setAttribute('aria-label', shortCity_(r.city) + (reached ? ', reached' : ', not yet reached') + '. Read its story.');
+      (function (item, isReached, anchor) {
+        hit.addEventListener('mouseenter', function () { openLocCard_(item, isReached, anchor, false); });
+        hit.addEventListener('mouseleave', closeLocCardIfHover_);
+        hit.addEventListener('focus', function () { openLocCard_(item, isReached, anchor, false); });
+        hit.addEventListener('blur', closeLocCardIfHover_);
+        hit.addEventListener('click', function (e) { e.stopPropagation(); openLocCard_(item, isReached, anchor, true); });
+        hit.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLocCard_(item, isReached, anchor, true); }
+        });
+      })(r, reached, hit);
+      g.appendChild(hit);
     });
 
     var fc = STATE.progress.fractionComplete;
@@ -82,6 +104,48 @@
     for (var i = 0; i < pins.length; i++) {
       if (pins[i].getAttribute('data-city') === city) { pins[i].classList.add('pin-pulse'); break; }
     }
+  }
+
+  function openLocCard_(item, reached, anchor, sticky) {
+    var card = document.getElementById('loc-card');
+    var status = item.cumulativeMiles === 0
+      ? 'Starting line'
+      : (reached ? '✓ Reached • mile ' + fmtMiles_(item.cumulativeMiles)
+                 : 'Still ahead • mile ' + fmtMiles_(item.cumulativeMiles));
+    var statusEl = document.getElementById('loc-status');
+    statusEl.textContent = status;
+    statusEl.className = 'loc-status ' + (reached ? 'is-reached' : 'is-ahead');
+    document.getElementById('loc-title').textContent = shortCity_(item.city);
+    document.getElementById('loc-sor').style.display = (item.sorTag === 'sor') ? 'inline-block' : 'none';
+    document.getElementById('loc-note').textContent = item.celebrationMessage;
+    positionCard_(card, anchor);
+    card.classList.add('show');
+    if (sticky) locSticky_ = true;
+  }
+
+  function positionCard_(card, anchor) {
+    var prevVis = card.style.visibility;
+    card.style.visibility = 'hidden';
+    card.classList.add('show');
+    var rect = anchor.getBoundingClientRect();
+    var cw = card.offsetWidth, ch = card.offsetHeight;
+    var left = rect.left + rect.width / 2 - cw / 2;
+    var top = rect.top - ch - 12;
+    if (top < 8) top = rect.bottom + 12;
+    left = Math.max(8, Math.min(left, window.innerWidth - cw - 8));
+    card.style.left = left + 'px';
+    card.style.top = top + 'px';
+    card.style.visibility = prevVis || '';
+  }
+
+  function hideLocCard_() {
+    var card = document.getElementById('loc-card');
+    if (card) card.classList.remove('show');
+    locSticky_ = false;
+  }
+
+  function closeLocCardIfHover_() {
+    if (!locSticky_) document.getElementById('loc-card').classList.remove('show');
   }
 
   function renderStatus_() {
@@ -268,6 +332,14 @@
     for (var i = 0; i < navBtns.length; i++) {
       navBtns[i].addEventListener('click', function () { goView_(this.getAttribute('data-view')); });
     }
+
+    document.getElementById('loc-close').addEventListener('click', function (e) {
+      e.stopPropagation(); hideLocCard_();
+    });
+    document.addEventListener('click', function () { if (locSticky_) hideLocCard_(); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { hideLocCard_(); hideOverlay_('ov-confirm'); hideOverlay_('ov-edit'); }
+    });
   }
 
   function goView_(name) {

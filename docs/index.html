@@ -42,6 +42,7 @@
         <div class="total"><span id="total-miles">0</span> <span class="unit">miles</span></div>
         <div class="next" id="next-line">Loading the journey...</div>
         <div class="to-coast" id="coast-line"></div>
+        <div class="tap-hint" id="tap-hint">Tap a stop to read its story.</div>
       </div>
     </section>
 
@@ -84,6 +85,14 @@
   </nav>
 
   <div class="toast" id="toast"></div>
+
+  <div class="loc-card" id="loc-card" role="dialog" aria-live="polite">
+    <button class="loc-close" id="loc-close" type="button" aria-label="Close">&times;</button>
+    <div class="loc-status" id="loc-status"></div>
+    <h3 class="loc-title" id="loc-title"></h3>
+    <div class="loc-sor" id="loc-sor">Science of Reading stop</div>
+    <p class="loc-note" id="loc-note"></p>
+  </div>
 
   <div class="overlay" id="ov-name">
     <div class="modal">
