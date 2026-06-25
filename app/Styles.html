@@ -1,0 +1,222 @@
+<style>
+  /*
+   * Ignite Reading brand tokens (design/visual-direction.md).
+   * Contrast rules that bite: never pink text on purple/dark, never blue
+   * text on white. On purple, emphasis is yellow first, then white or blue.
+   */
+  :root {
+    --purple: #27004B;
+    --purple-600: #514F9C;
+    --purple-300: #9A98CB;
+    --purple-050: #F7F4FA;
+    --pink: #ED017F;
+    --pink-300: #F18DC1;
+    --pink-050: #FDF5F5;
+    --blue: #39C2D7;
+    --yellow: #FFC854;
+    --ink: #3D3C3C;
+    --white: #FFFFFF;
+    --map-land: #3A206A;          /* quiet basemap, a touch lighter than --purple */
+    --font-base: "Roboto", "Helvetica Neue", "Liberation Sans", Arial, sans-serif;
+    --radius-card: 14px;
+    --radius-pill: 999px;
+    --shadow-card: 0 6px 20px rgba(39, 0, 75, 0.10);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-base);
+    color: var(--ink);
+    background: var(--purple-050);
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: 72px; /* room for the fixed bottom nav */
+  }
+
+  .app-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 16px;
+    background: var(--purple);
+    color: var(--white);
+  }
+  .logo-mark { width: 22px; height: 22px; flex: 0 0 auto; }
+  .logo-word { font-weight: 700; font-size: 15px; letter-spacing: 0.2px; }
+  .logo-word .word-light { color: var(--yellow); }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ---------- Map view (purple, the emotional center) ---------- */
+  #view-map { background: var(--purple); color: var(--white); min-height: calc(100vh - 118px); }
+  .map-wrap { width: 100%; padding: 4px 0 0; }
+  .map-wrap svg { width: 100%; height: auto; display: block; }
+
+  /* SVG map colors (CSS var() is unreliable as an SVG presentation attribute) */
+  #us-land { fill: var(--map-land); stroke: none; }
+  #route-full {
+    fill: none; stroke: var(--purple-300); stroke-width: 4;
+    stroke-linecap: round; stroke-dasharray: 2 7; opacity: 0.85;
+  }
+  #route-traveled {
+    fill: none; stroke: url(#routeGrad); stroke-width: 6; stroke-linecap: round;
+    transition: stroke-dasharray .8s ease;
+  }
+  #dot { transition: transform .8s ease; }
+  #dot circle { fill: var(--pink); stroke: var(--white); stroke-width: 4; }
+
+  .pin { stroke: var(--purple); stroke-width: 2; }
+  .pin-unreached { fill: var(--purple); stroke: var(--purple-300); }
+  .pin-sor { fill: var(--blue); }
+  .pin-literary { fill: var(--yellow); }
+  .pin-home { fill: var(--white); }
+  .pin-pulse { animation: pinPulse 1.2s ease-out 1; }
+  @keyframes pinPulse {
+    0% { r: 5; }
+    40% { r: 11; }
+    100% { r: 6; }
+  }
+
+  .status {
+    padding: 4px 18px 18px;
+    text-align: center;
+  }
+  .status .total {
+    font-weight: 900;
+    font-size: 44px;
+    line-height: 1.05;
+    color: var(--white);
+  }
+  .status .total .unit { font-size: 18px; font-weight: 700; color: var(--purple-300); }
+  .status .next {
+    margin-top: 6px;
+    font-size: 15px;
+    color: var(--white);
+  }
+  .status .next b { color: var(--yellow); font-weight: 700; }
+  .status .to-coast { margin-top: 2px; font-size: 13px; color: var(--purple-300); }
+
+  /* ---------- Log view (light, fast) ---------- */
+  #view-log { padding: 18px 16px 24px; }
+  .card {
+    background: var(--white);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 18px 16px;
+    margin: 0 auto 16px;
+    max-width: 520px;
+  }
+  .card h2 { margin: 0 0 4px; font-size: 19px; color: var(--purple); font-weight: 700; }
+  .card .sub { margin: 0 0 14px; font-size: 13px; color: var(--ink); opacity: 0.75; }
+
+  .unit-toggle { display: flex; gap: 8px; margin-bottom: 14px; }
+  .unit-toggle button {
+    flex: 1; padding: 10px; border: 1.5px solid var(--purple-300);
+    background: var(--white); color: var(--purple);
+    border-radius: var(--radius-pill); font-size: 15px; font-weight: 500;
+    cursor: pointer;
+  }
+  .unit-toggle button.selected { background: var(--purple-600); color: var(--white); border-color: var(--purple-600); }
+
+  .num-field {
+    width: 100%; font-size: 34px; font-weight: 900; text-align: center;
+    padding: 14px 10px; border: 2px solid var(--purple-300);
+    border-radius: var(--radius-card); color: var(--ink);
+  }
+  .num-field:focus { outline: none; border-color: var(--pink); }
+  .conversion { text-align: center; min-height: 20px; margin: 8px 0 12px; font-size: 14px; color: var(--ink); }
+  .conversion b { color: var(--pink); font-weight: 700; }
+
+  .chips { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
+  .chip {
+    border: 1.5px solid var(--pink); background: var(--white); color: var(--pink);
+    border-radius: var(--radius-pill); padding: 8px 16px; font-size: 15px; font-weight: 700;
+    cursor: pointer;
+  }
+  .chip:active, .chip.flash { background: var(--pink); color: var(--white); }
+
+  .btn-primary {
+    width: 100%; padding: 15px; border: none; border-radius: var(--radius-pill);
+    background: var(--pink); color: var(--white); font-size: 17px; font-weight: 700;
+    cursor: pointer;
+  }
+  .btn-primary:disabled { opacity: 0.5; cursor: default; }
+
+  .date-row { text-align: center; margin-top: 12px; font-size: 13px; color: var(--ink); opacity: 0.8; }
+  .date-row a { color: var(--purple-600); cursor: pointer; text-decoration: underline; }
+  .date-row input[type="date"] { font-family: var(--font-base); font-size: 14px; padding: 4px; }
+
+  /* ---------- Personal tally ---------- */
+  .tally .your-miles { font-size: 30px; font-weight: 900; color: var(--purple); }
+  .tally .your-miles .unit { font-size: 14px; font-weight: 700; color: var(--purple-600); }
+  .entry-list { list-style: none; margin: 12px 0 0; padding: 0; }
+  .entry-list li {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0; border-top: 1px solid var(--purple-050);
+    font-size: 14px;
+  }
+  .entry-list .e-miles { font-weight: 700; color: var(--ink); min-width: 64px; }
+  .entry-list .e-date { color: var(--ink); opacity: 0.7; flex: 1; }
+  .entry-list .e-act { background: none; border: none; cursor: pointer; font-size: 13px; font-weight: 700; }
+  .entry-list .e-edit { color: var(--purple-600); }
+  .entry-list .e-del { color: var(--pink); }
+  .empty { color: var(--ink); opacity: 0.7; font-size: 14px; padding: 6px 0; }
+
+  /* ---------- Bottom nav ---------- */
+  .nav {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    display: flex; background: var(--white); border-top: 1px solid var(--purple-050);
+    box-shadow: 0 -4px 16px rgba(39,0,75,0.08);
+  }
+  .nav button {
+    flex: 1; padding: 12px 0 14px; border: none; background: none; cursor: pointer;
+    font-size: 13px; font-weight: 700; color: var(--purple-300);
+  }
+  .nav button.active { color: var(--pink); }
+  .nav .nav-ico { display: block; font-size: 18px; line-height: 1.2; }
+
+  /* ---------- Toast + modals ---------- */
+  .toast {
+    position: fixed; left: 50%; bottom: 86px; transform: translateX(-50%) translateY(20px);
+    max-width: 90%; background: var(--purple); color: var(--white);
+    padding: 14px 18px; border-radius: var(--radius-card);
+    box-shadow: 0 10px 30px rgba(39,0,75,0.35);
+    border-left: 5px solid var(--yellow);
+    opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease;
+    z-index: 50; font-size: 15px; text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast .mile-line { color: var(--yellow); font-weight: 700; }
+
+  .overlay {
+    position: fixed; inset: 0; background: rgba(39,0,75,0.55);
+    display: none; align-items: center; justify-content: center; padding: 20px; z-index: 60;
+  }
+  .overlay.show { display: flex; }
+  .modal {
+    background: var(--white); border-radius: var(--radius-card); padding: 22px 20px;
+    max-width: 380px; width: 100%; box-shadow: var(--shadow-card);
+  }
+  .modal h3 { margin: 0 0 8px; color: var(--purple); font-size: 20px; font-weight: 700; }
+  .modal p { margin: 0 0 14px; font-size: 15px; color: var(--ink); }
+  .modal label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--ink); }
+  .modal input[type="text"], .modal input[type="number"], .modal input[type="date"] {
+    width: 100%; padding: 12px; font-size: 16px; border: 1.5px solid var(--purple-300);
+    border-radius: 10px; font-family: var(--font-base); margin-bottom: 14px;
+  }
+  .modal .row { display: flex; gap: 10px; }
+  .modal .row .btn-primary { flex: 1; }
+  .btn-ghost {
+    flex: 1; padding: 15px; border: 1.5px solid var(--purple-300); border-radius: var(--radius-pill);
+    background: var(--white); color: var(--purple-600); font-size: 16px; font-weight: 700; cursor: pointer;
+  }
+
+  @media (min-width: 700px) {
+    .status .total { font-size: 56px; }
+    .map-wrap { max-width: 920px; margin: 0 auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .toast { transition: none; }
+    #dot, #route-traveled { transition: none !important; }
+  }
+</style>

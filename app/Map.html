@@ -1,0 +1,47 @@
+<!--
+  Map.html - stylized inline SVG US map (no map API key, plan.md Decision 2).
+  - #us-land: a low-poly silhouette, a quiet basemap.
+  - #route-full: the whole route, muted (distance not yet traveled).
+  - #route-traveled: the traveled portion, pink->yellow, revealed via dasharray.
+  - #markers: milestone pins, placed by JS at cumulativeMiles/goal along the path.
+  - #dot: the shared team dot, placed at fractionComplete along the path.
+  Colors live in Styles.html (CSS var() is unreliable as an SVG attribute).
+  Client.html positions the pins and the dot with getPointAtLength.
+-->
+<div class="map-wrap">
+  <svg id="map-svg" viewBox="0 0 1000 480" role="img"
+       aria-label="A stylized map of the United States with the team's progress from San Francisco to New York.">
+    <defs>
+      <linearGradient id="routeGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#ED017F"/>
+        <stop offset="100%" stop-color="#FFC854"/>
+      </linearGradient>
+      <filter id="dotGlow" x="-60%" y="-60%" width="220%" height="220%">
+        <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#ED017F" flood-opacity="0.55"/>
+      </filter>
+    </defs>
+
+    <!-- Stylized continental US silhouette -->
+    <path id="us-land" d="
+      M158 130 L250 118 L360 110 L470 110 L560 110 L600 130 L622 110 L700 118
+      L782 110 L820 126 L842 110 L846 130 L838 172 L826 216 L816 256 L806 260
+      L817 306 L821 356 L812 376 L800 340 L793 306 L740 320 L662 320 L630 332
+      L600 376 L572 332 L560 312 L432 302 L300 294 L250 290 L212 272 L192 240
+      L178 196 L168 162 Z"/>
+
+    <!-- The route: one path. Muted underlay, then the traveled overlay. -->
+    <path id="route-full" d="
+      M186 280 C 280 306, 360 262, 470 262 C 560 262, 648 214, 720 222
+      C 800 228, 846 206, 880 198"/>
+    <path id="route-traveled" stroke-dasharray="0 100000" d="
+      M186 280 C 280 306, 360 262, 470 262 C 560 262, 648 214, 720 222
+      C 800 228, 846 206, 880 198"/>
+
+    <g id="markers"></g>
+
+    <!-- The shared team dot (positioned by JS). White ring is the brand circle treatment. -->
+    <g id="dot" transform="translate(186,280)">
+      <circle r="9"/>
+    </g>
+  </svg>
+</div>

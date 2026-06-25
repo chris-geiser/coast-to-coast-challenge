@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Local Claude Code settings
+.claude/
+
+# clasp (if you later switch to the clasp workflow; keep the script ID private)
+.clasp.json
+.clasprc.json
+
+# Node (not used by the app itself, only if tooling is added later)
+node_modules/
+npm-debug.log*
+
+# Editor cruft
+.vscode/
+*.swp

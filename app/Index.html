@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <?!= include('Styles'); ?>
+</head>
+<body>
+  <header class="app-header">
+    <!-- Placeholder logo lockup (decision: Roboto + fallback, official logo TBD) -->
+    <svg class="logo-mark" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M13 2 L5 13 h6 l-1 9 9-13 h-6 z" fill="#FFC854"/>
+    </svg>
+    <span class="logo-word">Ignite Reading</span>
+  </header>
+
+  <main>
+    <!-- ===================== MAP (default) ===================== -->
+    <section id="view-map" class="view active">
+      <?!= include('Map'); ?>
+      <div class="status" id="status">
+        <div class="total"><span id="total-miles">0</span> <span class="unit">miles</span></div>
+        <div class="next" id="next-line">Loading the journey...</div>
+        <div class="to-coast" id="coast-line"></div>
+      </div>
+    </section>
+
+    <!-- ===================== LOG ===================== -->
+    <section id="view-log" class="view">
+      <div class="card">
+        <h2>Log a walk or run</h2>
+        <p class="sub">One number is all it takes. Every mile moves the team east.</p>
+
+        <div class="unit-toggle" role="group" aria-label="Choose unit">
+          <button id="unit-miles" class="selected" type="button">Miles</button>
+          <button id="unit-steps" type="button">Steps</button>
+        </div>
+
+        <input id="num-input" class="num-field" type="number" inputmode="decimal"
+               min="0" step="any" placeholder="0" aria-label="How far did you go?">
+        <div class="conversion" id="conversion"></div>
+
+        <div class="chips" id="chips" aria-label="Quick add"></div>
+
+        <button id="btn-log" class="btn-primary" type="button">Add my miles</button>
+
+        <div class="date-row">
+          <span id="date-text">Logged today. <a id="date-toggle">Change date</a></span>
+          <input id="date-input" type="date" style="display:none;">
+        </div>
+      </div>
+
+      <div class="card tally">
+        <h2>Your miles</h2>
+        <div class="your-miles"><span id="your-miles">0</span> <span class="unit">mi</span></div>
+        <p class="sub" style="margin-top:8px;">Just yours. Never a rank, never compared.</p>
+        <ul class="entry-list" id="entry-list"></ul>
+        <div class="empty" id="entry-empty" style="display:none;">
+          No miles yet, and that is just fine. Your first walk counts, even a quick lap around the block. Add it above.
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== RECOGNITION (deferred to Phase 7) ===================== -->
+    <section id="view-recognition" class="view"></section>
+  </main>
+
+  <!-- ===================== BOTTOM NAV ===================== -->
+  <nav class="nav">
+    <button data-view="map" class="active"><span class="nav-ico">🗺️</span>Map</button>
+    <button data-view="log"><span class="nav-ico">➕</span>Log</button>
+  </nav>
+
+  <!-- ===================== TOAST ===================== -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ===================== MODALS ===================== -->
+  <div class="overlay" id="ov-name">
+    <div class="modal">
+      <h3>Welcome! Glad you're here.</h3>
+      <p>What should we call you? This is the name your teammates will see next to your miles.</p>
+      <label for="name-input">Your name</label>
+      <input id="name-input" type="text" maxlength="40" placeholder="e.g., Chris G.">
+      <button id="btn-name" class="btn-primary" type="button">Start moving</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="ov-confirm">
+    <div class="modal">
+      <h3>Quick check</h3>
+      <p id="confirm-text"></p>
+      <div class="row">
+        <button id="btn-confirm-yes" class="btn-primary" type="button">Yes, log it</button>
+        <button id="btn-confirm-no" class="btn-ghost" type="button">Let me fix it</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="ov-edit">
+    <div class="modal">
+      <h3>Edit your entry</h3>
+      <label for="edit-num">Distance</label>
+      <input id="edit-num" type="number" inputmode="decimal" min="0" step="any">
+      <label for="edit-date">Date</label>
+      <input id="edit-date" type="date">
+      <div class="row">
+        <button id="btn-edit-save" class="btn-primary" type="button">Save</button>
+        <button id="btn-edit-cancel" class="btn-ghost" type="button">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <?!= include('Client'); ?>
+</body>
+</html>
