@@ -75,22 +75,22 @@ Most of the front end and all of the math. The only thing truly coupled to Apps 
 
 So the work to date is not wasted. The UI, the map, the copy, and the logic port forward; the Google plumbing is what gets swapped.
 
-## Decisions I need from you
+## Decisions (status as of 2026-06-25)
 
-Recommendations in parentheses. The first one is the real blocker.
+1. **AWS ownership**: DevOps owns the account, infrastructure-as-code, deploys, monitoring, and the database. Resolved; the blocker is cleared.
+2. **Auth / identity provider**: Amazon Cognito, federated to the Ignite Google Workspace. Confirmed.
+3. **Database**: owned by DevOps. Recommendation to hand them: DynamoDB, with an atomic-counter item for the team total and a time-ordered index for the feed and recompute. DevOps makes the final call on engine and table design.
+4. **Config editing**: resolved. Chris edits the route cities, goal, step rate, quick-add buttons, and celebration copy in a Google Sheet, and DevOps wires a small sync so AWS (DynamoDB) picks up the changes. This preserves the spec's no-code-config goal (FR-015) and the familiar-spreadsheet workflow from the original design. DevOps owns the sync mechanism (for example, a scheduled Lambda reading the Sheet via the Sheets API, or a manual publish step).
+5. **IaC tool**: DevOps's choice. Recommendation: AWS CDK in TypeScript, or AWS SAM. (Infrastructure-as-code means the AWS setup is defined in version-controlled files and deployed repeatably, not clicked together by hand in the console.)
+6. **Region**: a domestic US region; the exact one is owned by DevOps (commonly us-east-1 in Virginia or us-west-2 in Oregon). No data-residency constraint beyond "in the US" noted. DevOps confirms.
 
-1. **Who owns the AWS side**: account, infrastructure-as-code, deploys, monitoring, on-call if anything breaks. [DATA NEEDED] This determines how much I lean on fully managed pieces versus a standard engineer-run setup.
-2. **Auth / identity provider** (Cognito federated to your Google Workspace). Confirm, or name your provider if it is Okta, Azure AD, Cloudflare Access, or you want the ALB edge gate.
-3. **Database** (DynamoDB). Alternatives: keep a Google Sheet as the database behind the AWS API, or Aurora Serverless if you want relational. I recommend DynamoDB for the access patterns and cost.
-4. **Config editing** (DynamoDB or SSM, edited by an engineer). Or keep a Google Sheet synced in if non-engineer editing matters.
-5. **IaC tool** (CDK in TypeScript). SAM or Terraform are fine if your team has a standard.
-6. **Region** (us-east-1 or us-west-2). Any data-residency constraint? [DATA NEEDED]
+Because DevOps owns items 1, 3, 5, and 6, those become a hand-off, not a blocker on Chris. I will package the AWS specifics (the DynamoDB design, the Cognito-to-Google federation setup, the IaC recommendation, and the region note) into a short DevOps hand-off so their team can stand up Phase B.
 
-## What I would do next, pending your answers
+## What I would do next
 
-1. You answer 1 through 6, especially who owns ops.
-2. I update spec.md FR-008, the privacy note, plan.md, and research.md to reflect AWS.
-3. I build **Phase A**, the static prototype, since it does not depend on the AWS specifics and gets you a shareable link on GitHub Pages quickly.
-4. We schedule **Phase B**, the AWS build, against your answers.
+All product decisions are resolved (2026-06-25): Cognito auth federated to Google Workspace, config edited in a Google Sheet synced into AWS, DynamoDB recommended to DevOps, and the public demo prototype approved. Remaining steps, pending Chris's go-ahead to start building:
 
-I am not writing any code until you approve this direction, since you asked to design first.
+1. Update spec.md (FR-008, FR-015, the privacy note), plan.md, and research.md to reflect AWS and the Sheet-synced config.
+2. Build **Phase A**, the static prototype, for GitHub Pages (browser-local demo data, no auth, demo data only).
+3. Produce the **DevOps hand-off** for Phase B: the DynamoDB design, the Cognito-to-Google federation setup, the config-Sheet sync, the IaC recommendation, and the region note.
+4. Schedule Phase B with DevOps.
