@@ -12,6 +12,9 @@
   var selectedDate = todayStr_();
   var editingId = null;
   var locSticky_ = false;
+  var locFacts_ = [];
+  var locFactIdx_ = 0;
+  var locAnchor_ = null;
 
   function api(method) {
     var args = Array.prototype.slice.call(arguments, 1);
@@ -118,9 +121,22 @@
     document.getElementById('loc-title').textContent = shortCity_(item.city);
     document.getElementById('loc-sor').style.display = (item.sorTag === 'sor') ? 'inline-block' : 'none';
     document.getElementById('loc-note').textContent = item.celebrationMessage;
+    locFacts_ = item.triviaFacts || [];
+    locFactIdx_ = 0;
+    locAnchor_ = anchor;
+    renderTriviaFact_();
     positionCard_(card, anchor);
     card.classList.add('show');
     if (sticky) locSticky_ = true;
+  }
+
+  function renderTriviaFact_() {
+    var wrap = document.getElementById('loc-trivia');
+    var more = document.getElementById('loc-more');
+    if (!locFacts_ || !locFacts_.length) { wrap.classList.add('hidden'); return; }
+    wrap.classList.remove('hidden');
+    document.getElementById('loc-fact').textContent = locFacts_[locFactIdx_].text;
+    more.classList.toggle('hidden', locFacts_.length < 2);
   }
 
   function positionCard_(card, anchor) {
@@ -335,6 +351,14 @@
 
     document.getElementById('loc-close').addEventListener('click', function (e) {
       e.stopPropagation(); hideLocCard_();
+    });
+    document.getElementById('loc-more').addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (!locFacts_ || locFacts_.length < 2) return;
+      locFactIdx_ = (locFactIdx_ + 1) % locFacts_.length;
+      locSticky_ = true;
+      renderTriviaFact_();
+      if (locAnchor_) positionCard_(document.getElementById('loc-card'), locAnchor_);
     });
     document.addEventListener('click', function () { if (locSticky_) hideLocCard_(); });
     document.addEventListener('keydown', function (e) {

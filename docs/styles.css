@@ -113,6 +113,19 @@ body {
   padding: 3px 9px; border-radius: var(--radius-pill); margin-bottom: 8px;
 }
 .loc-note { margin: 0; color: var(--ink); }
+.loc-trivia { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--purple-050); }
+.loc-trivia.hidden { display: none; }
+.loc-eyebrow {
+  display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--purple-600); margin-bottom: 4px;
+}
+.loc-fact { margin: 0; color: var(--ink); font-size: 13px; line-height: 1.5; }
+.loc-more {
+  margin-top: 8px; padding: 6px 4px; min-height: 32px;
+  background: none; border: none; cursor: pointer;
+  color: var(--purple-600); font-size: 13px; font-weight: 700; font-family: var(--font-base);
+}
+.loc-more.hidden { display: none; }
 
 #view-log { padding: 18px 16px 24px; }
 .card {
