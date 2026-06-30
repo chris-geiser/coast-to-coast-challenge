@@ -53,6 +53,6 @@ Deferred (next, after MVP review): the full finish/completion hero (US2 tail), m
 ## Open items and placeholders
 
 - `launchTimestamp` is intentionally blank. Set it in `Config_Settings` before launch.
-- The header logo is a placeholder spark + wordmark. Drop in the official Ignite Reading logo when available.
+- The prototype (`docs/`) uses the official Ignite Reading white logo, extracted from the brand sheet to `docs/ignite-logo-white.png`. The legacy `app/` Apps Script header still has a placeholder.
 - The mission micro-facts in [specs/design/copy.md](specs/design/copy.md) are marked `[DATA NEEDED]`; confirm current figures with Marketing before showing them.
-- The map silhouette is a hand-tuned low-poly approximation. Eyeball it once in the deployed app (launch checklist, T034).
+- The prototype uses the real continental US outline. The legacy `app/Map.html` still has the low-poly placeholder.

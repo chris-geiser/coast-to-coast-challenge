@@ -9,10 +9,8 @@
 </head>
 <body>
   <header class="app-header">
-    <svg class="logo-mark" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M13 2 L5 13 h6 l-1 9 9-13 h-6 z" fill="#FFC854"/>
-    </svg>
-    <span class="logo-word">Ignite Reading</span>
+    <img class="logo" src="ignite-logo-white.png" alt="Ignite Reading" width="60" height="26">
+    <span class="header-tag">Coast-to-Coast Challenge</span>
   </header>
 
   <main>
@@ -80,8 +78,20 @@
   </main>
 
   <nav class="nav">
-    <button data-view="map" class="active"><span class="nav-ico">🗺️</span>Map</button>
-    <button data-view="log"><span class="nav-ico">➕</span>Log</button>
+    <button data-view="map" class="active" aria-label="Map">
+      <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 21s-6-5.4-6-10a6 6 0 0 1 12 0c0 4.6-6 10-6 10z"/>
+        <circle cx="12" cy="11" r="2.3"/>
+      </svg>
+      <span class="nav-label">Map</span>
+    </button>
+    <button data-view="log" aria-label="Log a walk or run">
+      <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 8v8 M8 12h8"/>
+      </svg>
+      <span class="nav-label">Log</span>
+    </button>
   </nav>
 
   <div class="toast" id="toast"></div>
