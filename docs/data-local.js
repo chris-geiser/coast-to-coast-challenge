@@ -29,7 +29,7 @@
         { text: "City Lights, founded here in 1953, was the country's first all-paperback bookstore, and in 1957 it won the obscenity trial over Ginsberg's 'Howl,' a landmark for free expression.", source: "https://en.wikipedia.org/wiki/City_Lights_Bookstore" }
       ] },
     { order: 2, city: 'Sacramento, CA', cumulativeMiles: 87,
-      celebrationMessage: "Sacramento! California's capital, where the state committed to the Science of Reading. 87 miles down, together.", sorTag: 'sor',
+      celebrationMessage: "Sacramento, our first stop! 87 miles down, together.", sorTag: 'sor',
       triviaFacts: [
         { text: "California's capital, where the state signed its 2025 Science of Reading law (AB 1454), moving classrooms toward explicit, evidence-based reading instruction.", source: "https://edsource.org/2025/governor-newsom-signs-literacy-bill/742396" },
         { text: "Writer Joan Didion, one of America's most influential essayists, was born in Sacramento in 1934.", source: "https://www.britannica.com/biography/Joan-Didion" }

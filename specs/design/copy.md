@@ -28,7 +28,7 @@ Optional: occasionally append a gentle mission tie, for example "Coast to coast,
 These replace the short placeholders in data-model.md. Warm, with a real nod to each city's literacy connection (full sourcing in spec.md Appendix A). Keep one per city.
 
 1. San Francisco: "And we're off! We start in the Bay Area, where Ignite Reading began. Every great story starts with the basics, and so does every great journey."
-2. Sacramento: "Sacramento! California's capital, where the state committed to the Science of Reading. 87 miles down, together."
+2. Sacramento: "Sacramento, our first stop! 87 miles down, together." (The Science of Reading and state-capital detail now lives in the stop's tap-to-reveal trivia, so the celebration line stays warm and non-repetitive.)
 3. Reno: "Over the Sierra Nevada and into Reno. The mountains are behind us."
 4. Salt Lake City: "Salt Lake City! We've crossed the Great Basin. That is real distance, all of us together."
 5. Cheyenne: "Cheyenne, Wyoming. Through the Rockies and onto the high plains. Look how far we have come."
