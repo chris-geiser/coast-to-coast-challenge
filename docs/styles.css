@@ -97,6 +97,7 @@ body {
   max-width: 264px; background: var(--white); color: var(--ink);
   border-radius: var(--radius-card); box-shadow: 0 10px 30px rgba(39,0,75,0.35);
   padding: 14px 16px 16px; font-size: 14px; line-height: 1.45;
+  max-height: calc(100vh - 100px); overflow-y: auto; -webkit-overflow-scrolling: touch;
 }
 .loc-card.show { display: block; }
 .loc-close {
@@ -120,12 +121,7 @@ body {
   text-transform: uppercase; color: var(--purple-600); margin-bottom: 4px;
 }
 .loc-fact { margin: 0; color: var(--ink); font-size: 13px; line-height: 1.5; }
-.loc-more {
-  margin-top: 8px; padding: 6px 4px; min-height: 32px;
-  background: none; border: none; cursor: pointer;
-  color: var(--purple-600); font-size: 13px; font-weight: 700; font-family: var(--font-base);
-}
-.loc-more.hidden { display: none; }
+.loc-fact + .loc-fact { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--purple-050); }
 
 #view-log { padding: 18px 16px 24px; }
 .card {

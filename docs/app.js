@@ -12,9 +12,6 @@
   var selectedDate = todayStr_();
   var editingId = null;
   var locSticky_ = false;
-  var locFacts_ = [];
-  var locFactIdx_ = 0;
-  var locAnchor_ = null;
 
   function api(method) {
     var args = Array.prototype.slice.call(arguments, 1);
@@ -121,22 +118,24 @@
     document.getElementById('loc-title').textContent = shortCity_(item.city);
     document.getElementById('loc-sor').style.display = (item.sorTag === 'sor') ? 'inline-block' : 'none';
     document.getElementById('loc-note').textContent = item.celebrationMessage;
-    locFacts_ = item.triviaFacts || [];
-    locFactIdx_ = 0;
-    locAnchor_ = anchor;
-    renderTriviaFact_();
+    renderTrivia_(item.triviaFacts || []);
     positionCard_(card, anchor);
     card.classList.add('show');
     if (sticky) locSticky_ = true;
   }
 
-  function renderTriviaFact_() {
+  function renderTrivia_(facts) {
     var wrap = document.getElementById('loc-trivia');
-    var more = document.getElementById('loc-more');
-    if (!locFacts_ || !locFacts_.length) { wrap.classList.add('hidden'); return; }
+    var box = document.getElementById('loc-facts');
+    box.innerHTML = '';
+    if (!facts.length) { wrap.classList.add('hidden'); return; }
     wrap.classList.remove('hidden');
-    document.getElementById('loc-fact').textContent = locFacts_[locFactIdx_].text;
-    more.classList.toggle('hidden', locFacts_.length < 2);
+    facts.forEach(function (f) {
+      var p = document.createElement('p');
+      p.className = 'loc-fact';
+      p.textContent = f.text;
+      box.appendChild(p);
+    });
   }
 
   function positionCard_(card, anchor) {
@@ -148,6 +147,7 @@
     var left = rect.left + rect.width / 2 - cw / 2;
     var top = rect.top - ch - 12;
     if (top < 8) top = rect.bottom + 12;
+    if (top + ch > window.innerHeight - 8) top = Math.max(8, window.innerHeight - 8 - ch);
     left = Math.max(8, Math.min(left, window.innerWidth - cw - 8));
     card.style.left = left + 'px';
     card.style.top = top + 'px';
@@ -351,14 +351,6 @@
 
     document.getElementById('loc-close').addEventListener('click', function (e) {
       e.stopPropagation(); hideLocCard_();
-    });
-    document.getElementById('loc-more').addEventListener('click', function (e) {
-      e.stopPropagation();
-      if (!locFacts_ || locFacts_.length < 2) return;
-      locFactIdx_ = (locFactIdx_ + 1) % locFacts_.length;
-      locSticky_ = true;
-      renderTriviaFact_();
-      if (locAnchor_) positionCard_(document.getElementById('loc-card'), locAnchor_);
     });
     document.addEventListener('click', function () { if (locSticky_) hideLocCard_(); });
     document.addEventListener('keydown', function (e) {
