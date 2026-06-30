@@ -49,7 +49,7 @@ body {
 }
 .app-header .logo { height: 26px; width: auto; display: block; flex: 0 0 auto; }
 .app-header .header-tag {
-  font-size: 13px; font-weight: 500; color: var(--purple-300);
+  font-size: 14px; font-weight: 500; color: var(--white);
   border-left: 1px solid var(--purple-600); padding-left: 10px;
 }
 
@@ -86,7 +86,7 @@ body {
 .status .total .unit { font-size: 18px; font-weight: 700; color: var(--purple-300); }
 .status .next { margin-top: 10px; font-size: 16px; color: var(--white); }
 .status .next b { color: var(--yellow); font-weight: 700; }
-.status .to-coast { margin-top: 3px; font-size: 13px; color: var(--purple-300); }
+.status .to-coast { margin-top: 9px; font-size: 13px; color: var(--purple-300); }
 .status .tap-hint { margin-top: 18px; font-size: 13px; color: var(--purple-300); }
 
 .pin-hit { cursor: pointer; outline: none; }
