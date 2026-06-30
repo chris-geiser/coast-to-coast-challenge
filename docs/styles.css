@@ -49,7 +49,7 @@ body {
 }
 .app-header .logo { height: 26px; width: auto; display: block; flex: 0 0 auto; }
 .app-header .header-tag {
-  font-size: 14px; font-weight: 500; color: var(--white);
+  font-size: 14px; font-weight: 700; color: var(--white);
   border-left: 1px solid var(--purple-600); padding-left: 10px;
 }
 
