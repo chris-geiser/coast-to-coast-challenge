@@ -80,13 +80,14 @@ Header for the section: "Different ways to shine."
 
 ## Welcome / onboarding (shown once after the name prompt; reopenable via the header About button)
 
-Draft copy, edit freely. Uses only safe facts (the 2,984-mile goal, Bay Area origin, Recharge and First Grade Promise framing). No growth stats, since those are [DATA NEEDED]. An optional Loom video appears above the text when `welcomeVideoUrl` is set in the Settings tab; otherwise it is text-only.
+Leads with the aspirational idea from the challenge kickoff: no one crosses the country alone, but together the team can, and that mirrors the mission (no one reaches every student alone). Non-competitive by design, no per-person target. Uses only safe facts (the ~3,000-mile route, Bay Area origin, Recharge framing). No growth stats, since those are [DATA NEEDED]. An optional Loom video appears above the text when `welcomeVideoUrl` is set in the Settings tab; otherwise it is text-only.
 
 - Heading: "Welcome aboard! Here's the idea."
 - Body:
-  - "We're going coast to coast together. Every walk, run, or ride you log adds miles to one shared journey, moving our dot from the Bay Area, where Ignite Reading began, all the way to New York. The goal is 2,984 miles, the width of the country."
-  - "Every distance counts the same. A quick lap around the block matters as much as a long run. There is no leaderboard for miles, just a team inching east and a few playful ways we celebrate everyone who shows up."
-  - "Tap Log to add your miles or steps, watch the map move, and check Recognition for the different ways we shine. This is Recharge time, taking care of yourself so you can keep showing up for the kids learning to read."
+  - "No one crosses the country alone. But if each of us covers a manageable piece, a walk here, a run or ride there, the whole team travels the nearly 3,000 miles from the Bay Area to New York. Together we go farther than any of us could on our own."
+  - "Some weeks you'll have a lot to give, some weeks a little, and that's exactly the point. When one of us is running low, someone else makes up the difference. No leaderboard, no comparing. A quick lap around the block counts as much as a long run."
+  - "This is the same thing our mission asks of us every day: no one reaches every student alone, but together we can go the distance. The trip across the map is that promise, measured in miles."
+  - "Tap Log to add your miles or steps, watch the dot move east, and check Recognition for the ways we celebrate showing up. It's Recharge time too, so take care of yourself out there. Thanks for pulling with the team."
 - Button: "Let's go"
 
 ## Plausibility confirm (task T018)
