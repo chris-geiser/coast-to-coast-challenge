@@ -1,6 +1,8 @@
 # AWS Architecture: Coast-to-Coast Literacy Challenge
 
-**Date**: 2026-06-25 | **Status**: Draft for review | **Supersedes**: the Apps Script stack in plan.md and research.md Decisions 1 and 3
+> **SUPERSEDED (2026-07-08).** We chose to ship on a Google Sheet backend instead of AWS. See [sheet-backend.md](sheet-backend.md) for the live design. This document is kept for history and in case scale ever forces a move to AWS. Nothing here is being built.
+
+**Date**: 2026-06-25 | **Status**: Superseded by sheet-backend.md | **Supersedes**: the Apps Script stack in plan.md and research.md Decisions 1 and 3
 
 ## Why this document exists
 

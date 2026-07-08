@@ -144,8 +144,17 @@
     </div>
   </div>
 
-  <script src="progress.js?v=5"></script>
-  <script src="data-local.js?v=5"></script>
-  <script src="app.js?v=5"></script>
+  <script src="progress.js?v=6"></script>
+  <script src="data-content.js?v=6"></script>
+  <!--
+    Data layer. Exactly ONE of the two below should be active.
+    - data-local.js : browser-local demo (default; no backend needed).
+    - data-sheet.js : live Google Sheet backend. To cut over, deploy the Apps
+      Script (see specs/sheet-backend.md), fill in API_URL + SHARED_SECRET in
+      data-sheet.js, then comment out data-local and uncomment data-sheet.
+  -->
+  <script src="data-local.js?v=6"></script>
+  <!-- <script src="data-sheet.js?v=6"></script> -->
+  <script src="app.js?v=6"></script>
 </body>
 </html>
