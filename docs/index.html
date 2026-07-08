@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Coast-to-Coast Literacy Challenge</title>
   <meta name="robots" content="noindex">
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
   <header class="app-header">
@@ -76,6 +76,14 @@
 
       <p class="demo-note">Prototype with demo data, stored only in this browser. <a id="reset-demo">Reset demo data</a></p>
     </section>
+
+    <section id="view-recognition" class="view">
+      <div class="rec-intro">
+        <h2>Different ways to shine</h2>
+        <p class="sub">No single winner, because everyone who moved is part of this.</p>
+      </div>
+      <div class="rec-boards" id="rec-boards"></div>
+    </section>
   </main>
 
   <nav class="nav">
@@ -92,6 +100,13 @@
         <path d="M12 8v8 M8 12h8"/>
       </svg>
       <span class="nav-label">Log</span>
+    </button>
+    <button data-view="recognition" aria-label="Recognition">
+      <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="9" r="5"/>
+        <path d="M9 13.5 L7.5 21 L12 18.5 L16.5 21 L15 13.5"/>
+      </svg>
+      <span class="nav-label">Recognition</span>
     </button>
   </nav>
 
@@ -144,8 +159,17 @@
     </div>
   </div>
 
-  <script src="progress.js?v=6"></script>
-  <script src="data-content.js?v=6"></script>
+  <div class="overlay" id="ov-finish">
+    <div class="modal finish-modal">
+      <div class="finish-headline">Coast to coast. <i>We made it together.</i></div>
+      <p class="finish-sub" id="finish-sub"></p>
+      <div class="finish-caption" id="finish-caption"></div>
+      <button id="btn-finish" class="btn-primary" type="button">See who showed up</button>
+    </div>
+  </div>
+
+  <script src="progress.js?v=7"></script>
+  <script src="data-content.js?v=7"></script>
   <!--
     Data layer. Exactly ONE of the two below should be active.
     - data-local.js : browser-local demo (default; no backend needed).
@@ -153,8 +177,8 @@
       Script (see specs/sheet-backend.md), fill in API_URL + SHARED_SECRET in
       data-sheet.js, then comment out data-local and uncomment data-sheet.
   -->
-  <script src="data-local.js?v=6"></script>
-  <!-- <script src="data-sheet.js?v=6"></script> -->
-  <script src="app.js?v=6"></script>
+  <script src="data-local.js?v=7"></script>
+  <!-- <script src="data-sheet.js?v=7"></script> -->
+  <script src="app.js?v=7"></script>
 </body>
 </html>

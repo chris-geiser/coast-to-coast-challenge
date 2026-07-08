@@ -29,6 +29,7 @@
     return api('getState').then(function (s) {
       STATE = s;
       renderAll_();
+      renderRecognition_();
       if (!STATE.user.displayName) showOverlay_('ov-name');
     }).catch(function () {
       document.getElementById('next-line').textContent = 'Could not load the challenge. Refresh to try again.';
@@ -336,11 +337,17 @@
     document.getElementById('btn-edit-save').addEventListener('click', saveEdit_);
     document.getElementById('btn-edit-cancel').addEventListener('click', function () { hideOverlay_('ov-edit'); });
 
+    document.getElementById('btn-finish').addEventListener('click', function () {
+      try { localStorage.setItem('c2c_finish_seen', '1'); } catch (e) {}
+      hideOverlay_('ov-finish');
+      goView_('recognition');
+    });
+
     var reset = document.getElementById('reset-demo');
     if (reset) reset.addEventListener('click', function (e) {
       e.preventDefault();
       if (window.dataClient._resetDemo) { window.dataClient._resetDemo(); }
-      try { localStorage.removeItem('c2c_unit'); } catch (x) {}
+      try { localStorage.removeItem('c2c_unit'); localStorage.removeItem('c2c_finish_seen'); } catch (x) {}
       location.reload();
     });
 
@@ -354,7 +361,7 @@
     });
     document.addEventListener('click', function () { if (locSticky_) hideLocCard_(); });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') { hideLocCard_(); hideOverlay_('ov-confirm'); hideOverlay_('ov-edit'); }
+      if (e.key === 'Escape') { hideLocCard_(); hideOverlay_('ov-confirm'); hideOverlay_('ov-edit'); hideOverlay_('ov-finish'); }
     });
   }
 
@@ -363,7 +370,62 @@
     for (var i = 0; i < views.length; i++) views[i].classList.toggle('active', views[i].id === 'view-' + name);
     var btns = document.querySelectorAll('.nav button');
     for (var j = 0; j < btns.length; j++) btns[j].classList.toggle('active', btns[j].getAttribute('data-view') === name);
+    if (name === 'recognition') renderRecognition_();
     window.scrollTo(0, 0);
+  }
+
+  // The four inclusive boards, plus the one-time arrival moment at the finish.
+  function renderRecognition_() {
+    return api('getRecognition').then(function (rec) {
+      var box = document.getElementById('rec-boards');
+      if (box) {
+        box.innerHTML = '';
+        (rec.boards || []).forEach(function (b) {
+          var card = document.createElement('div');
+          card.className = 'rec-board';
+          var h = document.createElement('h3');
+          h.className = 'rec-board-title';
+          h.textContent = b.title;
+          var rule = document.createElement('p');
+          rule.className = 'rec-board-rule';
+          rule.textContent = b.rule;
+          var blurb = document.createElement('p');
+          blurb.className = 'rec-board-blurb';
+          if (b.blurb) {
+            blurb.textContent = b.blurb;
+          } else {
+            blurb.textContent = 'Still early. This one fills in as folks log.';
+            blurb.classList.add('is-empty');
+          }
+          card.appendChild(h);
+          card.appendChild(rule);
+          card.appendChild(blurb);
+          box.appendChild(card);
+        });
+      }
+      maybeShowFinish_(rec);
+      return rec;
+    }).catch(function () { /* boards are non-critical; keep the app usable */ });
+  }
+
+  function maybeShowFinish_(rec) {
+    if (!rec || !rec.isComplete) return;
+    // elapsed days depend on config.launchTimestamp, which is a placeholder
+    // until Marketing confirms the real launch date. [DATA NEEDED]
+    var days = rec.elapsed ? rec.elapsed.days : null;
+    var total = (STATE && STATE.progress) ? fmtMiles_(STATE.progress.totalMiles) : '';
+    var sub = document.getElementById('finish-sub');
+    var cap = document.getElementById('finish-caption');
+    if (sub) {
+      sub.textContent = 'From the Bay Area to New York, ' + total + ' miles' +
+        (days != null ? ' in ' + days + ' days' : '') +
+        '. Every one of those miles was someone choosing to step away from the desk and move. ' +
+        'That is the Recharge spirit, and it is the same energy we bring to every student learning to read.';
+    }
+    if (cap) cap.textContent = (days != null ? days + ' days, coast to coast.' : 'Coast to coast.');
+    var seen = null;
+    try { seen = localStorage.getItem('c2c_finish_seen'); } catch (e) {}
+    if (!seen) showOverlay_('ov-finish');
   }
 
   function showConfirm_(miles) {

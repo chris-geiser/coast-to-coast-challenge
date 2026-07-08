@@ -188,12 +188,13 @@
     },
 
     getRecognition: function () {
-      var total = recompute(getEntries() || []);
+      var entries = getEntries() || [];
+      var total = recompute(entries);
       var complete = total >= CONFIG.goalMiles;
       return resolve({
         isComplete: complete,
         elapsed: complete ? C2C.computeElapsed(CONFIG.launchTimestamp, getCompletion()) : null,
-        boards: []
+        boards: C2C.computeRecognition(entries, CONFIG)
       });
     },
 

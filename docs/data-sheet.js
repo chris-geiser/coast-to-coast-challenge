@@ -227,7 +227,7 @@
         return {
           isComplete: complete,
           elapsed: complete ? C2C.computeElapsed(s.launchTimestamp, s.completionTimestamp) : null,
-          boards: []
+          boards: C2C.computeRecognition(cache.entries, s)
         };
       }
       if (cache.settings) return Promise.resolve(build());
