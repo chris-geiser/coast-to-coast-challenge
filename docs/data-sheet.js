@@ -184,7 +184,8 @@
             plausibilityThresholdMiles: Number(s.plausibilityThresholdMiles) || CONFIG_DEFAULTS.plausibilityThresholdMiles,
             startCityLabel: s.startCityLabel || CONFIG_DEFAULTS.startCityLabel,
             launchTimestamp: s.launchTimestamp || CONFIG_DEFAULTS.launchTimestamp,
-            quickAddMiles: s.quickAddMiles || CONFIG_DEFAULTS.quickAddMiles
+            quickAddMiles: s.quickAddMiles || CONFIG_DEFAULTS.quickAddMiles,
+            welcomeVideoUrl: s.welcomeVideoUrl || CONFIG_DEFAULTS.welcomeVideoUrl || ''
           },
           route: ROUTE,
           progress: progressFrom(total),

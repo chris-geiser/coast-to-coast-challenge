@@ -189,7 +189,7 @@
           goalMiles: CONFIG.goalMiles, stepsPerMile: CONFIG.stepsPerMile,
           plausibilityThresholdMiles: CONFIG.plausibilityThresholdMiles,
           startCityLabel: CONFIG.startCityLabel, launchTimestamp: CONFIG.launchTimestamp,
-          quickAddMiles: CONFIG.quickAddMiles
+          quickAddMiles: CONFIG.quickAddMiles, welcomeVideoUrl: CONFIG.welcomeVideoUrl || ''
         },
         route: ROUTE,
         progress: buildProgress(total),

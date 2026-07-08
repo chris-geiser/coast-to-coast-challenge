@@ -100,7 +100,8 @@ function getState_(clientId) {
       startCityLabel: settings.startCityLabel || 'San Francisco / Bay Area',
       launchTimestamp: fmtIso_(settings.launchTimestamp),
       quickAddMiles: parseQuickAdd_(settings.quickAddMiles),
-      completionTimestamp: fmtIso_(settings.completionTimestamp) || ''
+      completionTimestamp: fmtIso_(settings.completionTimestamp) || '',
+      welcomeVideoUrl: settings.welcomeVideoUrl ? String(settings.welcomeVideoUrl) : ''
     },
     displayName: (participant && participant.displayName) ? participant.displayName : null,
     entries: entries.map(toClientEntry_)
@@ -425,7 +426,8 @@ function setup() {
     startCityLabel: 'San Francisco / Bay Area',
     launchTimestamp: '2026-08-05T09:00:00',
     quickAddMiles: '1,2,3,5',
-    completionTimestamp: ''
+    completionTimestamp: '',
+    welcomeVideoUrl: '' // optional Loom share URL; blank means text-only welcome
   };
   var current = readSettings_();
   Object.keys(defaults).forEach(function (k) {

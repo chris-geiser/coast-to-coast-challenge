@@ -30,7 +30,7 @@
       STATE = s;
       renderAll_();
       renderRecognition_();
-      if (!STATE.user.displayName) showOverlay_('ov-name');
+      maybeOnboard_();
     }).catch(function () {
       document.getElementById('next-line').textContent = 'Could not load the challenge. Refresh to try again.';
     });
@@ -312,6 +312,7 @@
       if (!res.ok) { toast_('Please enter a name (1 to 40 characters).'); return; }
       STATE.user.displayName = res.displayName;
       hideOverlay_('ov-name');
+      maybeOnboard_();
     }).catch(function () { toast_('Could not save your name. Try again.'); });
   }
 
@@ -343,6 +344,12 @@
       goView_('recognition');
     });
 
+    document.getElementById('btn-welcome').addEventListener('click', function () {
+      try { localStorage.setItem('c2c_welcome_seen', '1'); } catch (e) {}
+      hideOverlay_('ov-welcome');
+    });
+    document.getElementById('btn-about').addEventListener('click', showWelcome_);
+
     var reset = document.getElementById('reset-demo');
     if (reset) reset.addEventListener('click', function (e) {
       e.preventDefault();
@@ -361,7 +368,7 @@
     });
     document.addEventListener('click', function () { if (locSticky_) hideLocCard_(); });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') { hideLocCard_(); hideOverlay_('ov-confirm'); hideOverlay_('ov-edit'); hideOverlay_('ov-finish'); }
+      if (e.key === 'Escape') { hideLocCard_(); hideOverlay_('ov-confirm'); hideOverlay_('ov-edit'); hideOverlay_('ov-finish'); hideOverlay_('ov-welcome'); }
     });
   }
 
@@ -372,6 +379,37 @@
     for (var j = 0; j < btns.length; j++) btns[j].classList.toggle('active', btns[j].getAttribute('data-view') === name);
     if (name === 'recognition') renderRecognition_();
     window.scrollTo(0, 0);
+  }
+
+  // First-run flow: ask for a name, then show the welcome once. The About
+  // button in the header can reopen the welcome anytime.
+  function maybeOnboard_() {
+    if (!STATE.user.displayName) { showOverlay_('ov-name'); return; }
+    var seen = null;
+    try { seen = localStorage.getItem('c2c_welcome_seen'); } catch (e) {}
+    if (!seen) showWelcome_();
+  }
+
+  function showWelcome_() {
+    renderWelcomeVideo_();
+    showOverlay_('ov-welcome');
+  }
+
+  // Embed the welcome video only when the configured URL is a real Loom link.
+  // Anything else (including a blank Settings cell) stays text-only.
+  function renderWelcomeVideo_() {
+    var box = document.getElementById('welcome-video');
+    if (!box) return;
+    var url = (STATE && STATE.config) ? STATE.config.welcomeVideoUrl : '';
+    var m = url ? String(url).match(/^https:\/\/(?:www\.)?loom\.com\/(?:share|embed)\/([A-Za-z0-9]+)/) : null;
+    if (m) {
+      box.innerHTML = '<div class="video-frame"><iframe src="https://www.loom.com/embed/' + m[1] +
+        '" frameborder="0" allowfullscreen title="Welcome video"></iframe></div>';
+      box.hidden = false;
+    } else {
+      box.innerHTML = '';
+      box.hidden = true;
+    }
   }
 
   // The four inclusive boards, plus the one-time arrival moment at the finish.

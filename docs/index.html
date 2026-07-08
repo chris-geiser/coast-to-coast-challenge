@@ -5,12 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Coast-to-Coast Literacy Challenge</title>
   <meta name="robots" content="noindex">
-  <link rel="stylesheet" href="styles.css?v=8">
+  <link rel="stylesheet" href="styles.css?v=9">
 </head>
 <body>
   <header class="app-header">
     <img class="logo" src="ignite-logo-white.png" alt="Ignite Reading" width="60" height="26">
     <span class="header-tag">Coast-to-Coast Literacy Challenge</span>
+    <button id="btn-about" class="btn-about" type="button" aria-label="About this challenge">
+      <svg class="about-ico" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 11v5"/>
+        <circle cx="12" cy="7.75" r="0.6" fill="currentColor" stroke="none"/>
+      </svg>
+    </button>
   </header>
 
   <main>
@@ -156,6 +163,17 @@
     </div>
   </div>
 
+  <div class="overlay" id="ov-welcome">
+    <div class="modal welcome-modal">
+      <h3>Welcome aboard! Here's the idea.</h3>
+      <div class="welcome-video" id="welcome-video" hidden></div>
+      <p>We're going coast to coast together. Every walk, run, or ride you log adds miles to one shared journey, moving our dot from the Bay Area, where Ignite Reading began, all the way to New York. The goal is 2,984 miles, the width of the country.</p>
+      <p>Every distance counts the same. A quick lap around the block matters as much as a long run. There is no leaderboard for miles, just a team inching east and a few playful ways we celebrate everyone who shows up.</p>
+      <p>Tap <b>Log</b> to add your miles or steps, watch the map move, and check <b>Recognition</b> for the different ways we shine. This is Recharge time, taking care of yourself so you can keep showing up for the kids learning to read.</p>
+      <button id="btn-welcome" class="btn-primary" type="button">Let's go</button>
+    </div>
+  </div>
+
   <div class="overlay" id="ov-finish">
     <div class="modal finish-modal">
       <div class="finish-headline">Coast to coast. <i>We made it together.</i></div>
@@ -166,7 +184,7 @@
   </div>
 
   <script src="progress.js?v=13"></script>
-  <script src="data-content.js?v=10"></script>
+  <script src="data-content.js?v=14"></script>
   <!--
     Data layer. Exactly ONE of the two below should be active.
     - data-local.js : browser-local demo (default; no backend needed).
@@ -174,8 +192,8 @@
       Script (see specs/sheet-backend.md), fill in API_URL + SHARED_SECRET in
       data-sheet.js, then comment out data-local and uncomment data-sheet.
   -->
-  <!-- <script src="data-local.js?v=9"></script> -->
-  <script src="data-sheet.js?v=12"></script>
-  <script src="app.js?v=10"></script>
+  <!-- <script src="data-local.js?v=14"></script> -->
+  <script src="data-sheet.js?v=14"></script>
+  <script src="app.js?v=14"></script>
 </body>
 </html>

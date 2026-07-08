@@ -78,6 +78,17 @@ Header for the section: "Different ways to shine."
 - Field label: "Your name" (placeholder "e.g., Chris G.")
 - Button: "Start moving"
 
+## Welcome / onboarding (shown once after the name prompt; reopenable via the header About button)
+
+Draft copy, edit freely. Uses only safe facts (the 2,984-mile goal, Bay Area origin, Recharge and First Grade Promise framing). No growth stats, since those are [DATA NEEDED]. An optional Loom video appears above the text when `welcomeVideoUrl` is set in the Settings tab; otherwise it is text-only.
+
+- Heading: "Welcome aboard! Here's the idea."
+- Body:
+  - "We're going coast to coast together. Every walk, run, or ride you log adds miles to one shared journey, moving our dot from the Bay Area, where Ignite Reading began, all the way to New York. The goal is 2,984 miles, the width of the country."
+  - "Every distance counts the same. A quick lap around the block matters as much as a long run. There is no leaderboard for miles, just a team inching east and a few playful ways we celebrate everyone who shows up."
+  - "Tap Log to add your miles or steps, watch the map move, and check Recognition for the different ways we shine. This is Recharge time, taking care of yourself so you can keep showing up for the kids learning to read."
+- Button: "Let's go"
+
 ## Plausibility confirm (task T018)
 
 When an entry is over the threshold:

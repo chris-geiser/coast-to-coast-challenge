@@ -20,7 +20,8 @@
     plausibilityThresholdMiles: 50,
     startCityLabel: 'San Francisco / Bay Area',
     launchTimestamp: '2026-08-05T09:00:00',
-    quickAddMiles: [1, 2, 3, 5]
+    quickAddMiles: [1, 2, 3, 5],
+    welcomeVideoUrl: '' // optional Loom share URL for the welcome popup; blank = text only
   };
 
   var ROUTE = [
