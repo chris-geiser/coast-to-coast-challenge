@@ -410,8 +410,9 @@
 
   function maybeShowFinish_(rec) {
     if (!rec || !rec.isComplete) return;
-    // elapsed days depend on config.launchTimestamp, which is a placeholder
-    // until Marketing confirms the real launch date. [DATA NEEDED]
+    // Elapsed days run from config.launchTimestamp (2026-08-05) to completion.
+    // Before launch there is no positive elapsed span, so computeElapsed returns
+    // null and the day count is simply omitted (the fallback caption is used).
     var days = rec.elapsed ? rec.elapsed.days : null;
     var total = (STATE && STATE.progress) ? fmtMiles_(STATE.progress.totalMiles) : '';
     var sub = document.getElementById('finish-sub');

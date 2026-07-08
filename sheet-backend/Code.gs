@@ -398,7 +398,7 @@ function setup() {
     stepsPerMile: 2000,
     plausibilityThresholdMiles: 50,
     startCityLabel: 'San Francisco / Bay Area',
-    launchTimestamp: '2026-06-01T09:00:00',
+    launchTimestamp: '2026-08-05T09:00:00',
     quickAddMiles: '1,2,3,5',
     completionTimestamp: ''
   };
