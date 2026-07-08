@@ -53,23 +53,90 @@
     };
   }
 
+  // Small deterministic PRNG so the demo seed is varied but stable.
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  // A lifelike ~3-week window of team activity: real cadences, rest days, a
+  // range of walkers and runners, a few step-based logs, and a clear (but
+  // distinct) protagonist for each recognition board. Deterministic per reset.
   function seedIfEmpty() {
     if (getEntries() !== null) return;
-    var people = [
-      ['ada@demo.local', 'Ada L.'], ['ben@demo.local', 'Ben R.'], ['cleo@demo.local', 'Cleo M.'],
-      ['dev@demo.local', 'Dev P.'], ['evie@demo.local', 'Evie S.'], ['finn@demo.local', 'Finn T.']
-    ];
+    var dayMs = 86400000, WINDOW = 24;
+    var now = new Date();
+    var todayUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
     var entries = [];
-    var now = Date.now();
-    var dayMs = 86400000;
-    for (var i = 0; i < 150; i++) {
-      var p = people[i % people.length];
-      var daysAgo = 20 - (i % 21);
-      var miles = round(0.5 + (i % 7) * 0.6);
-      entries.push(mkEntry(p[0], p[1], 'miles', miles, miles, now - daysAgo * dayMs, ''));
+
+    function m1(x) { return Math.max(0.3, Math.round(x * 10) / 10); }
+    function add(email, name, miles, dd, hour, inputType, inputValue) {
+      var ms = todayUTC - (WINDOW - 1 - dd) * dayMs + Math.round(hour * 3600000);
+      entries.push(mkEntry(email, name, inputType || 'miles',
+        inputValue != null ? inputValue : miles, miles, ms, ''));
     }
-    entries.push(mkEntry(ME.email, 'You', 'miles', 2, 2, now - 3 * dayMs, ''));
-    entries.push(mkEntry(ME.email, 'You', 'miles', 3.5, 3.5, now - 1 * dayMs, ''));
+
+    // Grace: Most Days Active. Logs 21 of 24 days (a few rest days).
+    var gr = mulberry32(101);
+    for (var d = 0; d < WINDOW; d++) {
+      if (d === 4 || d === 12 || d === 19) continue;
+      add('grace@demo.local', 'Grace L.', m1(1.1 + gr() * 1.4), d, 7 + gr() * 3);
+    }
+    // Maya: Longest Streak. 16 days straight, then stops.
+    var my = mulberry32(202);
+    for (var d2 = 0; d2 < 16; d2++) add('maya@demo.local', 'Maya R.', m1(3 + my() * 3), d2, 6.5 + my() * 4);
+    // Theo: Most Improved. Steady climb from ~1 to ~5.5 mi/day.
+    var th = mulberry32(303);
+    for (var d3 = 0; d3 < WINDOW; d3++) {
+      if (th() < 0.25) continue;
+      var prog = d3 / (WINDOW - 1);
+      add('theo@demo.local', 'Theo K.', m1(1 + 4.6 * prog + (th() - 0.5) * 0.6), d3, 7 + th() * 3);
+    }
+    // Ivy: First Out of the Gate. Earliest timestamp of anyone, on day one.
+    add('ivy@demo.local', 'Ivy C.', m1(2.2), 0, 5.4);
+    var iv = mulberry32(404);
+    for (var d4 = 1; d4 < WINDOW; d4++) {
+      if (iv() < 0.55) continue;
+      add('ivy@demo.local', 'Ivy C.', m1(1.8 + iv() * 2.2), d4, 8 + iv() * 4);
+    }
+
+    // The rest of the team: varied cadences and distances.
+    var crowd = [
+      { email: 'marcus@demo.local', name: 'Marcus D.', prob: 0.5, lo: 4, hi: 8, longRun: true, seed: 11 },
+      { email: 'priya@demo.local', name: 'Priya S.', prob: 0.62, lo: 1, hi: 2.6, seed: 12 },
+      { email: 'ana@demo.local', name: 'Ana G.', prob: 0.3, lo: 1, hi: 3, seed: 13 },
+      { email: 'liam@demo.local', name: 'Liam O.', prob: 0.55, lo: 1.5, hi: 3, seed: 14 },
+      { email: 'sofia@demo.local', name: 'Sofia H.', prob: 0.45, lo: 3, hi: 6, longRun: true, seed: 15 },
+      { email: 'noah@demo.local', name: 'Noah B.', prob: 0.28, lo: 2, hi: 4, seed: 16 },
+      { email: 'emma@demo.local', name: 'Emma W.', prob: 0.5, lo: 1, hi: 2.4, seed: 17 },
+      { email: 'jamal@demo.local', name: 'Jamal T.', prob: 0.5, lo: 2, hi: 5, seed: 18 },
+      { email: 'diego@demo.local', name: 'Diego M.', prob: 0.32, lo: 3, hi: 5, seed: 19 },
+      { email: 'nina@demo.local', name: 'Nina P.', prob: 0.4, lo: 1.5, hi: 3.5, seed: 20 }
+    ];
+    crowd.forEach(function (p) {
+      var r = mulberry32(p.seed * 7 + 1);
+      for (var d5 = 0; d5 < WINDOW; d5++) {
+        if (r() >= p.prob) continue;
+        var miles = p.lo + (p.hi - p.lo) * r();
+        if (p.longRun && r() < 0.12) miles += 3 + r() * 4;
+        if (r() < 0.1) {
+          var steps = Math.round(miles * CONFIG.stepsPerMile / 100) * 100;
+          add(p.email, p.name, round(steps / CONFIG.stepsPerMile), d5, 7 + r() * 5, 'steps', steps);
+        } else {
+          add(p.email, p.name, m1(miles), d5, 7 + r() * 5);
+        }
+      }
+    });
+
+    // You: a few recent entries.
+    add(ME.email, 'You', 2.0, WINDOW - 4, 8);
+    add(ME.email, 'You', 3.4, WINDOW - 2, 18.5);
+    add(ME.email, 'You', 1.5, WINDOW - 1, 7.5);
+
     setEntries(entries);
   }
 
