@@ -136,7 +136,7 @@
     return [
       {
         key: 'days', title: 'Most Days Active',
-        rule: 'Showed up on the most days. Consistency is the whole game.',
+        rule: 'Showed up on the most days.',
         blurb: daysWinner.id ? nameOf(daysWinner) + ' logged on ' + daysWinner.val + ' different day' + (daysWinner.val === 1 ? '' : 's') + '.' : null
       },
       {

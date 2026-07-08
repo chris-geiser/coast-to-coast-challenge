@@ -47,7 +47,7 @@
 
     <section id="view-log" class="view">
       <div class="card">
-        <h2>Log a walk or run</h2>
+        <h2>Log a walk, run, or ride</h2>
         <p class="sub">One number is all it takes. Every mile moves the team east.</p>
         <div class="unit-toggle" role="group" aria-label="Choose unit">
           <button id="unit-miles" class="selected" type="button">Miles</button>
@@ -67,10 +67,9 @@
       <div class="card tally">
         <h2>Your miles</h2>
         <div class="your-miles"><span id="your-miles">0</span> <span class="unit">mi</span></div>
-        <p class="sub" style="margin-top:8px;">Just yours. Never a rank, never compared.</p>
         <ul class="entry-list" id="entry-list"></ul>
         <div class="empty" id="entry-empty" style="display:none;">
-          No miles yet, and that is just fine. Your first walk counts, even a quick lap around the block. Add it above.
+          No miles yet, and that is just fine. Your first walk, run, or ride counts, even a quick lap around the block. Add it above.
         </div>
       </div>
 
@@ -80,7 +79,6 @@
     <section id="view-recognition" class="view">
       <div class="rec-intro">
         <h2>Different ways to shine</h2>
-        <p class="sub">No single winner, because everyone who moved is part of this.</p>
       </div>
       <div class="rec-boards" id="rec-boards"></div>
     </section>
@@ -94,7 +92,7 @@
       </svg>
       <span class="nav-label">Map</span>
     </button>
-    <button data-view="log" aria-label="Log a walk or run">
+    <button data-view="log" aria-label="Log a walk, run, or ride">
       <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true">
         <circle cx="12" cy="12" r="9"/>
         <path d="M12 8v8 M8 12h8"/>
@@ -168,7 +166,7 @@
     </div>
   </div>
 
-  <script src="progress.js?v=7"></script>
+  <script src="progress.js?v=13"></script>
   <script src="data-content.js?v=10"></script>
   <!--
     Data layer. Exactly ONE of the two below should be active.

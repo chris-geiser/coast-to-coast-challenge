@@ -58,17 +58,17 @@ Button: "See who showed up" (into recognition).
 
 Keep all four equal in tone. Titles, one-line rules, and a winner blurb template.
 
-- Title "Most Days Active" / rule "Showed up on the most days. Consistency is the whole game." / blurb "[Name] logged on [X] different days."
+- Title "Most Days Active" / rule "Showed up on the most days." / blurb "[Name] logged on [X] different days."
 - Title "Longest Streak" / rule "The most days in a row." / blurb "[Name] kept it going [X] days straight."
 - Title "Most Improved" / rule "Grew the most from their first week to their last." / blurb "[Name] grew their weekly miles the most. Growth, not speed."
 - Title "First Out of the Gate" / rule "The very first to log a mile." / blurb "[Name] got us moving."
 
-Header for the section: "Different ways to shine. No single winner, because everyone who moved is part of this."
+Header for the section: "Different ways to shine."
 
 ## Empty states (task T030)
 
-- Team, day one (0 miles): "The journey starts here. Be the first to put us on the map. Log a walk or run and watch the dot leave the Bay Area."
-- Personal tally, no entries yet: "No miles yet, and that is just fine. Your first walk counts, even a quick lap around the block. Add it above."
+- Team, day one (0 miles): "The journey starts here. Be the first to put us on the map. Log a walk, run, or ride and watch the dot leave the Bay Area."
+- Personal tally, no entries yet: "No miles yet, and that is just fine. Your first walk, run, or ride counts, even a quick lap around the block. Add it above."
 - Recent activity feed, empty: "Quiet so far. Someone has to go first. Could be you."
 
 ## First-run name prompt (task T025)
