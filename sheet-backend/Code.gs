@@ -22,8 +22,9 @@
  * the Settings. Then Deploy > New deployment > Web app (see specs/sheet-backend.md).
  */
 
-// Must match SHARED_SECRET in docs/data-sheet.js.
-var SHARED_SECRET = 'CHANGE_ME_TO_A_RANDOM_STRING';
+// Must match SHARED_SECRET in docs/data-sheet.js. This is a low-sensitivity
+// speed bump, not real auth: the same value ships in the public frontend.
+var SHARED_SECRET = 'X6sZm2XkEEERyYm2CMtvmNfyK@WMbHqtzZFbRsT9UbQBqUNrCq';
 
 var SHEETS = {
   SETTINGS: 'Settings',
@@ -56,12 +57,20 @@ function doPost(e) {
   var clientId = String(body.clientId || '').trim();
   if (!clientId) return json_({ ok: false, error: 'NO_IDENTITY' });
 
-  switch (body.action) {
-    case 'log':     return json_(logActivity_(clientId, body));
-    case 'update':  return json_(updateEntry_(clientId, body));
-    case 'delete':  return json_(deleteEntry_(clientId, body));
-    case 'setName': return json_(setDisplayName_(clientId, body));
-    default:        return json_({ ok: false, error: 'UNKNOWN_ACTION' });
+  // Any handler exception becomes readable JSON. Without this, a thrown error
+  // returns an HTML error page with no CORS headers, which the browser can only
+  // report as an opaque "Failed to fetch".
+  try {
+    switch (body.action) {
+      case 'state':   return json_(getState_(clientId));
+      case 'log':     return json_(logActivity_(clientId, body));
+      case 'update':  return json_(updateEntry_(clientId, body));
+      case 'delete':  return json_(deleteEntry_(clientId, body));
+      case 'setName': return json_(setDisplayName_(clientId, body));
+      default:        return json_({ ok: false, error: 'UNKNOWN_ACTION' });
+    }
+  } catch (err) {
+    return json_({ ok: false, error: 'SERVER_ERROR', detail: String(err && err.message || err) });
   }
 }
 
@@ -111,8 +120,23 @@ function logActivity_(clientId, body) {
   var note = (body.note == null ? '' : String(body.note)).slice(0, 200);
 
   return withLock_(function () {
+    // Idempotent replay: if the client-supplied entryId already exists, this is
+    // a retry after a lost response. Return the same result without appending a
+    // second row, so a burst-induced retry can never create a duplicate.
+    if (body.entryId) {
+      var dup = findEntryRow_(body.entryId);
+      if (dup) {
+        var totalNow = recompute_();
+        return {
+          ok: true, entryId: body.entryId, miles: v.miles,
+          prevTotal: round_(totalNow - v.miles), newTotal: totalNow,
+          completionTimestamp: fmtIso_(readSettings_().completionTimestamp) || '',
+          duplicate: true
+        };
+      }
+    }
     var prevTotal = recompute_();
-    var entryId = Utilities.getUuid();
+    var entryId = body.entryId || Utilities.getUuid();
     var now = new Date();
     appendEntry_({
       entryId: entryId, clientId: clientId, displayName: displayName,
@@ -151,7 +175,7 @@ function updateEntry_(clientId, body) {
 function deleteEntry_(clientId, body) {
   return withLock_(function () {
     var loc = findEntryRow_(body.entryId);
-    if (!loc) return { ok: false, error: 'NOT_FOUND' };
+    if (!loc) return { ok: true, newTotal: recompute_() }; // already gone: idempotent, safe to retry
     if (String(loc.clientId) !== String(clientId)) return { ok: false, error: 'NOT_OWNER' };
     sheet_(SHEETS.ENTRIES).deleteRow(loc.row);
     return { ok: true, newTotal: recompute_() };
@@ -271,19 +295,20 @@ function readEntries_() {
 
 function appendEntry_(e) {
   var s = sheet_(SHEETS.ENTRIES);
-  var idx = headerIndex_(s.getRange(1, 1, 1, s.getLastColumn()).getValues()[0]);
-  var row = new Array(ENTRY_COLS.length).fill('');
-  row[idx.entryId] = e.entryId;
-  row[idx.clientId] = e.clientId;
-  row[idx.displayName] = e.displayName;
-  row[idx.inputType] = e.inputType;
-  row[idx.inputValue] = e.inputValue;
-  row[idx.miles] = e.miles;
-  row[idx.note] = e.note;
-  row[idx.source] = e.source;
-  row[idx.activityDate] = e.activityDate;
-  row[idx.createdAt] = e.createdAt;
+  ensureHeaders_(s, ENTRY_COLS);
+  // Build the row in the fixed ENTRY_COLS order. Not reading the header row at
+  // write time avoids throwing when the tab is empty (getLastColumn() === 0).
+  var row = ENTRY_COLS.map(function (c) { return e[c] != null ? e[c] : ''; });
   s.appendRow(row);
+}
+
+// Write the header row if the sheet has none. Keeps writes safe even if a tab
+// was created empty (e.g. a pre-existing blank tab setup() left untouched).
+function ensureHeaders_(s, cols) {
+  if (s.getLastRow() < 1) {
+    s.getRange(1, 1, 1, cols.length).setValues([cols]);
+    s.setFrozenRows(1);
+  }
 }
 
 function findEntryRow_(entryId) {
@@ -413,11 +438,7 @@ function setup() {
 }
 
 function ensureTab_(ss, name, cols) {
-  var s = ss.getSheetByName(name);
-  if (!s) {
-    s = ss.insertSheet(name);
-    s.getRange(1, 1, 1, cols.length).setValues([cols]);
-    s.setFrozenRows(1);
-  }
+  var s = ss.getSheetByName(name) || ss.insertSheet(name);
+  ensureHeaders_(s, cols); // add headers whether the tab is new or a blank pre-existing one
   return s;
 }

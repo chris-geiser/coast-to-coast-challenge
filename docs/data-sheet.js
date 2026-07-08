@@ -28,8 +28,8 @@
   /* ==================================================================== */
   /* FILL THESE IN AFTER YOU DEPLOY THE APPS SCRIPT (see sheet-backend.md) */
   /* ==================================================================== */
-  var API_URL = 'PASTE_YOUR_WEB_APP_EXEC_URL_HERE';
-  var SHARED_SECRET = 'PASTE_YOUR_SHARED_SECRET_HERE';
+  var API_URL = 'https://script.google.com/macros/s/AKfycbz42nuzilviy_nWGEDCWKIkwlMMGawh_93-SMzGukTzx2aqhgKrx5lbMWg43mIbJGA/exec';
+  var SHARED_SECRET = 'X6sZm2XkEEERyYm2CMtvmNfyK@WMbHqtzZFbRsT9UbQBqUNrCq';
   /* ==================================================================== */
 
   // Per-browser identity. Not real auth; just attributes entries to a device.
@@ -47,6 +47,13 @@
   }
   var ME = clientId();
 
+  function uuid() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
   function cacheName(n) { try { if (n != null) localStorage.setItem('c2c_display_name', n); } catch (e) {} }
   function cachedName() { try { return localStorage.getItem('c2c_display_name') || null; } catch (e) { return null; } }
 
@@ -58,14 +65,12 @@
   /* Transport                                                            */
   /* -------------------------------------------------------------------- */
 
-  function apiGet() {
-    var url = API_URL + '?action=state&secret=' + encodeURIComponent(SHARED_SECRET) +
-      '&clientId=' + encodeURIComponent(ME);
-    return fetch(url, { method: 'GET' }).then(function (r) { return r.json(); });
-  }
+  function delay(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
-  // text/plain avoids a CORS preflight the Apps Script endpoint cannot answer.
-  function apiPost(action, data) {
+  // One POST. text/plain avoids a CORS preflight the Apps Script endpoint cannot
+  // answer. Reads the body as text and parses, so a non-JSON error page (which
+  // Apps Script serves under overload) becomes a throw the retry layer catches.
+  function rawPost(action, data) {
     var body = {};
     for (var k in (data || {})) if (Object.prototype.hasOwnProperty.call(data, k)) body[k] = data[k];
     body.action = action;
@@ -75,8 +80,35 @@
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(body)
-    }).then(function (r) { return r.json(); });
+    }).then(function (r) { return r.text(); }).then(function (t) {
+      try { return JSON.parse(t); } catch (e) { throw new Error('BAD_RESPONSE'); }
+    });
   }
+
+  // Retry ONLY transient failures: a network error, a non-JSON error page, or a
+  // server lock timeout (SERVER_ERROR). Business errors (INVALID_VALUE,
+  // NEEDS_CONFIRMATION, NOT_OWNER, ...) come back as-is and are never retried.
+  // Every write is idempotent (client-supplied entryId on log, idempotent
+  // delete), so a retry after a lost response can never create a duplicate.
+  var RETRY_BACKOFF = [1200, 2800];
+  function apiPost(action, data) {
+    function attempt(i) {
+      return rawPost(action, data).then(function (res) {
+        if (res && res.error === 'SERVER_ERROR' && i < RETRY_BACKOFF.length) {
+          return delay(RETRY_BACKOFF[i]).then(function () { return attempt(i + 1); });
+        }
+        return res;
+      }, function () {
+        if (i < RETRY_BACKOFF.length) return delay(RETRY_BACKOFF[i]).then(function () { return attempt(i + 1); });
+        return { ok: false, error: 'NETWORK' };
+      });
+    }
+    return attempt(0);
+  }
+
+  // State is read over POST, not GET. Apps Script's GET redirect from
+  // script.google.com carries no CORS headers, so a cross-origin GET is blocked.
+  function apiGet() { return apiPost('state', {}); }
 
   /* -------------------------------------------------------------------- */
   /* Helpers                                                              */
@@ -177,6 +209,7 @@
       var v = validateMiles(payload);
       if (v.error) return Promise.resolve({ ok: false, error: v.error, miles: v.miles });
       return apiPost('log', {
+        entryId: uuid(), // idempotency key: reused across retries so a lost response cannot duplicate
         inputType: v.inputType, inputValue: v.inputValue,
         confirmedOverThreshold: !!payload.confirmedOverThreshold,
         activityDate: payload.activityDate || null,
