@@ -15,20 +15,26 @@ Shared route, trivia, and celebration copy live in `docs/data-content.js` so bot
 
 ## What the Sheet holds
 
-Three tabs, created for you by `setup()`:
+Five tabs, created for you by `setup()`:
 
 - **Entries**: entryId, clientId, displayName, inputType, inputValue, miles, note, source, activityDate, createdAt. One row per logged activity. This is the source of truth for the total.
 - **Participants**: clientId, displayName, joinedAt. Maps a browser to its chosen name.
-- **Settings**: key/value. The editable knobs, seeded with goalMiles 2984, stepsPerMile 2000, plausibilityThresholdMiles 50, startCityLabel, launchTimestamp, quickAddMiles, and completionTimestamp. Change a value here and the app picks it up on the next load, no code change.
+- **Settings**: key/value. The editable knobs, seeded with goalMiles 2984, stepsPerMile 2000, plausibilityThresholdMiles 50, startCityLabel, launchTimestamp, quickAddMiles, completionTimestamp, and welcomeVideoUrl. Change a value here and the app picks it up on the next load, no code change.
+- **Route**: order, city, cumulativeMiles, celebrationMessage, sorTag. One row per stop on the map, seeded with the 11 default stops. Edit these to rename a city, move a pin, or reword a milestone line.
+- **Trivia**: order, text, source. One row per tap-to-reveal fact, joined to a Route stop by `order`. A stop can have any number of facts; add or remove rows freely.
 
-Route, city order, cumulative miles, and trivia stay in `docs/data-content.js`. That is narrative copy, not operational data, and nested trivia is miserable to edit in a Sheet. It can be promoted to a tab later if non-engineers need to edit it.
+`setup()` seeds Route and Trivia from the bundled defaults only when Route is empty, so re-running it never overwrites your edits. `docs/data-content.js` keeps a copy of the route as the frontend fallback (used by the local demo, and if the tabs are ever empty), but once seeded the Sheet is the source of truth. Edit the tabs, not the code.
+
+Two guardrails when editing the Route tab:
+- Keep `order` sequential and the last stop's `cumulativeMiles` equal to `goalMiles` in Settings (2,984 today). If the final mile and the goal drift apart, the finish and the "miles to the Atlantic" math get confusing.
+- Editing `cumulativeMiles` mid-challenge moves the map pins and can make a milestone celebration re-fire or get skipped, since the dot's position and milestone crossing are computed from those numbers. Set the route before launch and leave it once people are logging.
 
 ## One-time setup
 
 1. Open the Sheet, then Extensions > Apps Script.
 2. Delete any starter `Code.gs` content. Create a file named `Code.gs` and paste the contents of `sheet-backend/Code.gs` from this repo. (Optional: also create `appsscript.json` to match, via Project Settings > "Show appsscript.json".)
 3. At the top of `Code.gs`, set `SHARED_SECRET` to a random string. Generate one however you like, for example a long random password. Keep it handy for the frontend step.
-4. From the function dropdown, choose `setup` and click Run. Approve the permission prompt (it needs to edit this Sheet). This creates the three tabs and seeds Settings. Safe to re-run; it only adds what is missing.
+4. From the function dropdown, choose `setup` and click Run. Approve the permission prompt (it needs to edit this Sheet). This creates the five tabs, seeds Settings, and seeds the Route and Trivia tabs with the default stops. Safe to re-run; it only adds what is missing and never overwrites Route/Trivia edits.
 
 ## Deploy the web app
 

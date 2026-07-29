@@ -21,9 +21,13 @@
   var round = C2C.round;
   var CONTENT = window.C2C_CONTENT;
 
-  var ROUTE = CONTENT.ROUTE;
   var CELEBRATIONS = CONTENT.CELEBRATIONS;
   var CONFIG_DEFAULTS = CONTENT.CONFIG;
+
+  // The route now lives in the Sheet (Route + Trivia tabs) and arrives via
+  // getState. The bundled copy is the fallback until the first fetch, or if the
+  // tabs are empty, so the map never renders without stops.
+  var routeData = CONTENT.ROUTE;
 
   /* ==================================================================== */
   /* FILL THESE IN AFTER YOU DEPLOY THE APPS SCRIPT (see sheet-backend.md) */
@@ -126,7 +130,7 @@
     };
   }
 
-  function progressFrom(total) { return C2C.computeProgress(settings(), ROUTE, total); }
+  function progressFrom(total) { return C2C.computeProgress(settings(), routeData, total); }
   function byCreatedDesc(a, b) { return new Date(b.createdAt) - new Date(a.createdAt); }
   function sumMiles(entries) { var s = 0; entries.forEach(function (e) { s += Number(e.miles) || 0; }); return round(s); }
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
@@ -165,6 +169,7 @@
         if (!res || !res.ok) throw new Error((res && res.error) || 'STATE_FAILED');
         cache.settings = res.settings || null;
         cache.entries = res.entries || [];
+        if (res.route && res.route.length) routeData = res.route;
         var s = settings();
         var total = sumMiles(cache.entries);
         var displayName = res.displayName || cachedName();
@@ -187,7 +192,7 @@
             quickAddMiles: s.quickAddMiles || CONFIG_DEFAULTS.quickAddMiles,
             welcomeVideoUrl: s.welcomeVideoUrl || CONFIG_DEFAULTS.welcomeVideoUrl || ''
           },
-          route: ROUTE,
+          route: routeData,
           progress: progressFrom(total),
           myEntries: mine.map(toClient),
           myTotalMiles: myTotal,
@@ -225,7 +230,7 @@
           ok: true, entryId: res.entryId, milesLogged: res.miles,
           celebrationMessage: pick(CELEBRATIONS),
           progress: progressFrom(next),
-          milestoneJustReached: C2C.findMilestoneCrossed(ROUTE, prev, next)
+          milestoneJustReached: C2C.findMilestoneCrossed(routeData, prev, next)
         };
       });
     },
