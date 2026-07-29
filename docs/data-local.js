@@ -192,6 +192,7 @@
           quickAddMiles: CONFIG.quickAddMiles, welcomeVideoUrl: CONFIG.welcomeVideoUrl || ''
         },
         route: ROUTE,
+        places: CONTENT.PLACES || [],
         progress: buildProgress(total),
         myEntries: mine.map(toClient),
         myTotalMiles: myTotal,

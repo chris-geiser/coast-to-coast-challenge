@@ -92,6 +92,38 @@
       g.appendChild(hit);
     });
 
+    // Partner locations: informational diamonds at their real map spot, off the
+    // trek line. Tap to reveal; they do not affect miles or progress.
+    (STATE.places || []).forEach(function (pl) {
+      var x = Number(pl.x), y = Number(pl.y);
+      if (!isFinite(x) || !isFinite(y)) return;
+      var d = document.createElementNS(SVGNS, 'path');
+      d.setAttribute('d', 'M ' + x + ' ' + (y - 6) + ' L ' + (x + 6) + ' ' + y + ' L ' + x + ' ' + (y + 6) + ' L ' + (x - 6) + ' ' + y + ' Z');
+      d.setAttribute('class', 'place-dot');
+      g.appendChild(d);
+
+      var phit = document.createElementNS(SVGNS, 'circle');
+      phit.setAttribute('cx', x);
+      phit.setAttribute('cy', y);
+      phit.setAttribute('r', 16);
+      phit.setAttribute('fill', 'transparent');
+      phit.setAttribute('class', 'pin-hit');
+      phit.setAttribute('tabindex', '0');
+      phit.setAttribute('role', 'button');
+      phit.setAttribute('aria-label', pl.name + ', an Ignite Reading partner. Read more.');
+      (function (place, anchor) {
+        phit.addEventListener('mouseenter', function () { openPlaceCard_(place, anchor, false); });
+        phit.addEventListener('mouseleave', closeLocCardIfHover_);
+        phit.addEventListener('focus', function () { openPlaceCard_(place, anchor, false); });
+        phit.addEventListener('blur', closeLocCardIfHover_);
+        phit.addEventListener('click', function (e) { e.stopPropagation(); openPlaceCard_(place, anchor, true); });
+        phit.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPlaceCard_(place, anchor, true); }
+        });
+      })(pl, phit);
+      g.appendChild(phit);
+    });
+
     var fc = STATE.progress.fractionComplete;
     var dp = path.getPointAtLength(fc * L);
     document.getElementById('dot').setAttribute('transform',
@@ -120,6 +152,22 @@
     document.getElementById('loc-sor').style.display = (item.sorTag === 'sor') ? 'inline-block' : 'none';
     document.getElementById('loc-note').textContent = item.celebrationMessage;
     renderTrivia_(item.triviaFacts || []);
+    positionCard_(card, anchor);
+    card.classList.add('show');
+    if (sticky) locSticky_ = true;
+  }
+
+  // Partner-location card. Reuses the location card shell but shows the partner
+  // story instead of a milestone (no reached/ahead status, no SoR tag, no trivia).
+  function openPlaceCard_(place, anchor, sticky) {
+    var card = document.getElementById('loc-card');
+    var statusEl = document.getElementById('loc-status');
+    statusEl.textContent = 'Ignite Reading partner';
+    statusEl.className = 'loc-status is-reached';
+    document.getElementById('loc-title').textContent = place.name;
+    document.getElementById('loc-sor').style.display = 'none';
+    document.getElementById('loc-note').textContent = place.blurb || '';
+    renderTrivia_([]);
     positionCard_(card, anchor);
     card.classList.add('show');
     if (sticky) locSticky_ = true;

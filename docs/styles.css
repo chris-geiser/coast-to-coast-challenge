@@ -81,6 +81,10 @@ body {
 .pin-pulse { animation: pinPulse 1.2s ease-out 1; }
 @keyframes pinPulse { 0% { r: 5; } 40% { r: 11; } 100% { r: 6; } }
 
+/* Partner locations: white diamonds outlined in blue, distinct from the round
+   journey pins and sitting off the trek line. Informational only. */
+.place-dot { fill: var(--white); stroke: var(--blue); stroke-width: 2; }
+
 .status { padding: 4px 18px 18px; text-align: center; }
 .status .total { font-weight: 900; font-size: 44px; line-height: 1.05; color: var(--white); }
 .status .total .unit { font-size: 18px; font-weight: 700; color: var(--purple-300); }

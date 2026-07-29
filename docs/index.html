@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Coast-to-Coast Literacy Challenge</title>
   <meta name="robots" content="noindex">
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
   <header class="app-header">
@@ -48,7 +48,7 @@
         <div class="total"><span id="total-miles">0</span> <span class="unit">miles</span></div>
         <div class="next" id="next-line">Loading the journey...</div>
         <div class="to-coast" id="coast-line"></div>
-        <div class="tap-hint" id="tap-hint">Tap a stop to read its story.</div>
+        <div class="tap-hint" id="tap-hint">Tap a stop for its story, or a diamond to meet an Ignite partner.</div>
       </div>
     </section>
 
@@ -185,7 +185,7 @@
   </div>
 
   <script src="progress.js?v=13"></script>
-  <script src="data-content.js?v=14"></script>
+  <script src="data-content.js?v=17"></script>
   <!--
     Data layer. Exactly ONE of the two below should be active.
     - data-local.js : browser-local demo (default; no backend needed).
@@ -193,8 +193,8 @@
       Script (see specs/sheet-backend.md), fill in API_URL + SHARED_SECRET in
       data-sheet.js, then comment out data-local and uncomment data-sheet.
   -->
-  <!-- <script src="data-local.js?v=14"></script> -->
-  <script src="data-sheet.js?v=15"></script>
-  <script src="app.js?v=14"></script>
+  <!-- <script src="data-local.js?v=16"></script> -->
+  <script src="data-sheet.js?v=16"></script>
+  <script src="app.js?v=16"></script>
 </body>
 </html>

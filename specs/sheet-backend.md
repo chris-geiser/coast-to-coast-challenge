@@ -15,13 +15,14 @@ Shared route, trivia, and celebration copy live in `docs/data-content.js` so bot
 
 ## What the Sheet holds
 
-Five tabs, created for you by `setup()`:
+Six tabs, created for you by `setup()`:
 
 - **Entries**: entryId, clientId, displayName, inputType, inputValue, miles, note, source, activityDate, createdAt. One row per logged activity. This is the source of truth for the total.
 - **Participants**: clientId, displayName, joinedAt. Maps a browser to its chosen name.
 - **Settings**: key/value. The editable knobs, seeded with goalMiles 2984, stepsPerMile 2000, plausibilityThresholdMiles 50, startCityLabel, launchTimestamp, quickAddMiles, completionTimestamp, and welcomeVideoUrl. Change a value here and the app picks it up on the next load, no code change.
 - **Route**: order, city, cumulativeMiles, celebrationMessage, sorTag. One row per stop on the map, seeded with the 11 default stops. Edit these to rename a city, move a pin, or reword a milestone line.
 - **Trivia**: order, text, source. One row per tap-to-reveal fact, joined to a Route stop by `order`. A stop can have any number of facts; add or remove rows freely.
+- **Places**: name, x, y, blurb, source. Ignite partner locations shown as diamond markers on the map, separate from the trek (no miles, no effect on progress). `x`/`y` are pixel coordinates in the map's 959x593 viewBox; edit the blurb freely, but nudging `x`/`y` takes trial and error, so ask an engineer or move in small steps and reload to check.
 
 `setup()` seeds Route and Trivia from the bundled defaults only when Route is empty, so re-running it never overwrites your edits. `docs/data-content.js` keeps a copy of the route as the frontend fallback (used by the local demo, and if the tabs are ever empty), but once seeded the Sheet is the source of truth. Edit the tabs, not the code.
 
@@ -34,7 +35,7 @@ Two guardrails when editing the Route tab:
 1. Open the Sheet, then Extensions > Apps Script.
 2. Delete any starter `Code.gs` content. Create a file named `Code.gs` and paste the contents of `sheet-backend/Code.gs` from this repo. (Optional: also create `appsscript.json` to match, via Project Settings > "Show appsscript.json".)
 3. At the top of `Code.gs`, set `SHARED_SECRET` to a random string. Generate one however you like, for example a long random password. Keep it handy for the frontend step.
-4. From the function dropdown, choose `setup` and click Run. Approve the permission prompt (it needs to edit this Sheet). This creates the five tabs, seeds Settings, and seeds the Route and Trivia tabs with the default stops. Safe to re-run; it only adds what is missing and never overwrites Route/Trivia edits.
+4. From the function dropdown, choose `setup` and click Run. Approve the permission prompt (it needs to edit this Sheet). This creates the six tabs, seeds Settings, and seeds the Route, Trivia, and Places tabs with the defaults. Safe to re-run; it only adds what is missing and never overwrites Route/Trivia/Places edits.
 
 ## Deploy the web app
 

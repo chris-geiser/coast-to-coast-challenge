@@ -31,13 +31,15 @@ var SHEETS = {
   ENTRIES: 'Entries',
   PARTICIPANTS: 'Participants',
   ROUTE: 'Route',
-  TRIVIA: 'Trivia'
+  TRIVIA: 'Trivia',
+  PLACES: 'Places'
 };
 
 var ENTRY_COLS = ['entryId', 'clientId', 'displayName', 'inputType', 'inputValue', 'miles', 'note', 'source', 'activityDate', 'createdAt'];
 var PARTICIPANT_COLS = ['clientId', 'displayName', 'joinedAt'];
 var ROUTE_COLS = ['order', 'city', 'cumulativeMiles', 'celebrationMessage', 'sorTag'];
 var TRIVIA_COLS = ['order', 'text', 'source'];
+var PLACE_COLS = ['name', 'x', 'y', 'blurb', 'source'];
 
 /* ==================================================================== */
 /* Web app entry points                                                  */
@@ -109,8 +111,31 @@ function getState_(clientId) {
     },
     displayName: (participant && participant.displayName) ? participant.displayName : null,
     route: readRoute_(),
+    places: readPlaces_(),
     entries: entries.map(toClientEntry_)
   };
+}
+
+// Ignite partner locations from the Places tab. Informational only (no miles);
+// returns [] if the tab is missing or empty so the frontend can fall back.
+function readPlaces_() {
+  var s = ss_().getSheetByName(SHEETS.PLACES);
+  if (!s || s.getLastRow() < 2) return [];
+  var v = s.getDataRange().getValues();
+  var idx = headerIndex_(v[0]);
+  var out = [];
+  for (var i = 1; i < v.length; i++) {
+    var row = v[i];
+    if (row[idx.name] === '' || row[idx.name] == null) continue;
+    out.push({
+      name: String(row[idx.name]),
+      x: Number(row[idx.x]),
+      y: Number(row[idx.y]),
+      blurb: row[idx.blurb] == null ? '' : String(row[idx.blurb]),
+      source: row[idx.source] == null ? '' : String(row[idx.source])
+    });
+  }
+  return out;
 }
 
 // The route (stops + joined trivia) from the Route and Trivia tabs. Returns []
@@ -453,9 +478,9 @@ function toClientEntry_(e) {
 /* ==================================================================== */
 
 /**
- * Run once from the Apps Script editor. Creates the five tabs with headers,
- * seeds Settings defaults, and seeds Route/Trivia with the default stops. Safe
- * to re-run: it only adds what is missing and never overwrites Route/Trivia.
+ * Run once from the Apps Script editor. Creates the six tabs with headers,
+ * seeds Settings defaults, and seeds Route/Trivia/Places with the defaults.
+ * Safe to re-run: only adds what is missing, never overwrites seeded tabs.
  */
 function setup() {
   var ss = ss_();
@@ -464,7 +489,9 @@ function setup() {
   ensureTab_(ss, SHEETS.PARTICIPANTS, PARTICIPANT_COLS);
   ensureTab_(ss, SHEETS.ROUTE, ROUTE_COLS);
   ensureTab_(ss, SHEETS.TRIVIA, TRIVIA_COLS);
+  ensureTab_(ss, SHEETS.PLACES, PLACE_COLS);
   seedRouteIfEmpty_();
+  seedPlacesIfEmpty_();
 
   var settings = ss.getSheetByName(SHEETS.SETTINGS);
   if (!settings) {
@@ -514,10 +541,28 @@ function seedRouteIfEmpty_() {
   if (triviaRows.length) ts.getRange(2, 1, triviaRows.length, TRIVIA_COLS.length).setValues(triviaRows);
 }
 
+// Seed the Places tab from PLACES_SEED, only when it has no data rows yet.
+function seedPlacesIfEmpty_() {
+  var s = sheet_(SHEETS.PLACES);
+  if (s.getLastRow() >= 2) return;
+  var rows = PLACES_SEED.map(function (p) { return [p.name, p.x, p.y, p.blurb, p.source]; });
+  if (rows.length) s.getRange(2, 1, rows.length, PLACE_COLS.length).setValues(rows);
+}
+
+// Mirrors docs/data-content.js PLACES. After seeding, edit the Places tab.
+var PLACES_SEED = [
+  { name: 'Red Bluff, CA', x: 62, y: 214, blurb: 'A partner since January 2022.', source: '' },
+  { name: 'La Jolla, CA', x: 104, y: 342, blurb: 'Summer school partner.', source: '' },
+  { name: 'Savannah-Chatham County, GA', x: 762, y: 430, blurb: 'One of our largest Georgia partnerships, with 1,766 seats.', source: '' },
+  { name: 'Spotsylvania, VA', x: 792, y: 296, blurb: 'Started with the VDOE and now continues with their own funding, all in on the First Grade Promise. 480 seats.', source: '' },
+  { name: 'Boston, MA', x: 842, y: 212, blurb: 'Partnering through the Massachusetts Department of Elementary and Secondary Education (DESE).', source: '' }
+];
+
 var ROUTE_SEED = [
   { order: 1, city: 'San Francisco / Bay Area, CA', cumulativeMiles: 0,
     celebrationMessage: "And we're off! We start in the Bay Area, where Ignite Reading began. Every great story starts with the basics, and so does every great journey.", sorTag: 'home',
     triviaFacts: [
+      { text: "Our story begins in Oakland, right here in the Bay Area.", source: "" },
       { text: "Robert Frost, the only poet to win four Pulitzer Prizes, was born in San Francisco in 1874.", source: "https://www.poetryfoundation.org/poets/robert-frost" },
       { text: "City Lights, founded here in 1953, was the country's first all-paperback bookstore, and in 1957 it won the obscenity trial over Ginsberg's 'Howl,' a landmark for free expression.", source: "https://en.wikipedia.org/wiki/City_Lights_Bookstore" }
     ] },

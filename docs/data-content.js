@@ -28,6 +28,7 @@
     { order: 1, city: 'San Francisco / Bay Area, CA', cumulativeMiles: 0,
       celebrationMessage: "And we're off! We start in the Bay Area, where Ignite Reading began. Every great story starts with the basics, and so does every great journey.", sorTag: 'home',
       triviaFacts: [
+        { text: "Our story begins in Oakland, right here in the Bay Area.", source: "" },
         { text: "Robert Frost, the only poet to win four Pulitzer Prizes, was born in San Francisco in 1874.", source: "https://www.poetryfoundation.org/poets/robert-frost" },
         { text: "City Lights, founded here in 1953, was the country's first all-paperback bookstore, and in 1957 it won the obscenity trial over Ginsberg's 'Howl,' a landmark for free expression.", source: "https://en.wikipedia.org/wiki/City_Lights_Bookstore" }
       ] },
@@ -104,5 +105,17 @@
     'Boom. The dot inched east. Keep taking care of you.'
   ];
 
-  window.C2C_CONTENT = { CONFIG: CONFIG, ROUTE: ROUTE, CELEBRATIONS: CELEBRATIONS };
+  // Ignite Reading partner locations. These are NOT stops on the trek; they are
+  // informational markers placed at their real spot on the map (x/y in the
+  // 959x593 SVG viewBox), tap-to-reveal, with no effect on miles or progress.
+  // Sheet-managed via the Places tab; this is the fallback / demo copy.
+  var PLACES = [
+    { name: 'Red Bluff, CA', x: 62, y: 214, blurb: 'A partner since January 2022.', source: '' },
+    { name: 'La Jolla, CA', x: 104, y: 342, blurb: 'Summer school partner.', source: '' },
+    { name: 'Savannah-Chatham County, GA', x: 762, y: 430, blurb: 'One of our largest Georgia partnerships, with 1,766 seats.', source: '' },
+    { name: 'Spotsylvania, VA', x: 792, y: 296, blurb: 'Started with the VDOE and now continues with their own funding, all in on the First Grade Promise. 480 seats.', source: '' },
+    { name: 'Boston, MA', x: 842, y: 212, blurb: 'Partnering through the Massachusetts Department of Elementary and Secondary Education (DESE).', source: '' }
+  ];
+
+  window.C2C_CONTENT = { CONFIG: CONFIG, ROUTE: ROUTE, CELEBRATIONS: CELEBRATIONS, PLACES: PLACES };
 })();

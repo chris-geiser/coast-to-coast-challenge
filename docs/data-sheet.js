@@ -28,6 +28,7 @@
   // getState. The bundled copy is the fallback until the first fetch, or if the
   // tabs are empty, so the map never renders without stops.
   var routeData = CONTENT.ROUTE;
+  var placesData = CONTENT.PLACES || []; // partner markers, also Sheet-driven via getState
 
   /* ==================================================================== */
   /* FILL THESE IN AFTER YOU DEPLOY THE APPS SCRIPT (see sheet-backend.md) */
@@ -170,6 +171,7 @@
         cache.settings = res.settings || null;
         cache.entries = res.entries || [];
         if (res.route && res.route.length) routeData = res.route;
+        if (res.places) placesData = res.places;
         var s = settings();
         var total = sumMiles(cache.entries);
         var displayName = res.displayName || cachedName();
@@ -193,6 +195,7 @@
             welcomeVideoUrl: s.welcomeVideoUrl || CONFIG_DEFAULTS.welcomeVideoUrl || ''
           },
           route: routeData,
+          places: placesData,
           progress: progressFrom(total),
           myEntries: mine.map(toClient),
           myTotalMiles: myTotal,
