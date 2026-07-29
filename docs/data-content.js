@@ -110,11 +110,11 @@
   // 959x593 SVG viewBox), tap-to-reveal, with no effect on miles or progress.
   // Sheet-managed via the Places tab; this is the fallback / demo copy.
   var PLACES = [
-    { name: 'Red Bluff, CA', x: 62, y: 214, blurb: 'A partner since January 2022.', source: '' },
-    { name: 'La Jolla, CA', x: 104, y: 342, blurb: 'Summer school partner.', source: '' },
-    { name: 'Savannah-Chatham County, GA', x: 762, y: 430, blurb: 'One of our largest Georgia partnerships, with 1,766 seats.', source: '' },
+    { name: 'Red Bluff, CA', x: 42, y: 216, blurb: 'A partner since January 2022.', source: '' },
+    { name: 'La Jolla, CA', x: 110, y: 352, blurb: 'Summer school partner.', source: '' },
+    { name: 'Savannah-Chatham County, GA', x: 770, y: 430, blurb: 'One of our largest Georgia partnerships, with 1,766 seats.', source: '' },
     { name: 'Spotsylvania, VA', x: 792, y: 296, blurb: 'Started with the VDOE and now continues with their own funding, all in on the First Grade Promise. 480 seats.', source: '' },
-    { name: 'Boston, MA', x: 842, y: 212, blurb: 'Partnering through the Massachusetts Department of Elementary and Secondary Education (DESE).', source: '' }
+    { name: 'Boston, MA', x: 846, y: 208, blurb: 'Partnering through the Massachusetts Department of Elementary and Secondary Education (DESE).', source: '' }
   ];
 
   window.C2C_CONTENT = { CONFIG: CONFIG, ROUTE: ROUTE, CELEBRATIONS: CELEBRATIONS, PLACES: PLACES };

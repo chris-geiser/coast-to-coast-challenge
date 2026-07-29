@@ -551,11 +551,11 @@ function seedPlacesIfEmpty_() {
 
 // Mirrors docs/data-content.js PLACES. After seeding, edit the Places tab.
 var PLACES_SEED = [
-  { name: 'Red Bluff, CA', x: 62, y: 214, blurb: 'A partner since January 2022.', source: '' },
-  { name: 'La Jolla, CA', x: 104, y: 342, blurb: 'Summer school partner.', source: '' },
-  { name: 'Savannah-Chatham County, GA', x: 762, y: 430, blurb: 'One of our largest Georgia partnerships, with 1,766 seats.', source: '' },
+  { name: 'Red Bluff, CA', x: 42, y: 216, blurb: 'A partner since January 2022.', source: '' },
+  { name: 'La Jolla, CA', x: 110, y: 352, blurb: 'Summer school partner.', source: '' },
+  { name: 'Savannah-Chatham County, GA', x: 770, y: 430, blurb: 'One of our largest Georgia partnerships, with 1,766 seats.', source: '' },
   { name: 'Spotsylvania, VA', x: 792, y: 296, blurb: 'Started with the VDOE and now continues with their own funding, all in on the First Grade Promise. 480 seats.', source: '' },
-  { name: 'Boston, MA', x: 842, y: 212, blurb: 'Partnering through the Massachusetts Department of Elementary and Secondary Education (DESE).', source: '' }
+  { name: 'Boston, MA', x: 846, y: 208, blurb: 'Partnering through the Massachusetts Department of Elementary and Secondary Education (DESE).', source: '' }
 ];
 
 var ROUTE_SEED = [
