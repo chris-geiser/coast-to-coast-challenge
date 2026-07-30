@@ -33,7 +33,7 @@
   /* ==================================================================== */
   /* FILL THESE IN AFTER YOU DEPLOY THE APPS SCRIPT (see sheet-backend.md) */
   /* ==================================================================== */
-  var API_URL = 'https://script.google.com/macros/s/AKfycbz42nuzilviy_nWGEDCWKIkwlMMGawh_93-SMzGukTzx2aqhgKrx5lbMWg43mIbJGA/exec';
+  var API_URL = 'https://script.google.com/macros/s/AKfycbw_LR8AVGqkZUmisGK3qu41jAlVDyKVXB8Mqlqwhp01S0xyWJm_JHkMICShw6z_2iiv/exec';
   var SHARED_SECRET = 'X6sZm2XkEEERyYm2CMtvmNfyK@WMbHqtzZFbRsT9UbQBqUNrCq';
   /* ==================================================================== */
 
