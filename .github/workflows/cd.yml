@@ -1,0 +1,240 @@
+name: Deploy to Elastic Beanstalk
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: runs-on=${{ github.run_id }},runner=1cpu-linux-arm64,extras=s3-cache
+    environment: production
+    env:
+      AWS_REGION: us-east-1
+      EB_APPLICATION_NAME: ${{ vars.EB_APPLICATION_NAME }}
+      EB_ENVIRONMENT_NAME: ${{ vars.EB_ENVIRONMENT_NAME }}
+      SHARED_ALB_ARN: arn:aws:elasticloadbalancing:us-east-1:937420755383:loadbalancer/app/ignite-apps/127897c746198b6c
+      OIDC_CLIENT_ID: ${{ secrets.OIDC_CLIENT_ID }}
+      OIDC_CLIENT_SECRET: ${{ secrets.OIDC_CLIENT_SECRET }}
+    steps:
+      - uses: runs-on/action@v2
+      - name: Checkout code
+        uses: actions/checkout@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Install EB CLI
+        run: |
+          pip install awsebcli
+      - name: Validate deployment configuration
+        run: |
+          : "${EB_APPLICATION_NAME:?Set repository variable EB_APPLICATION_NAME}"
+          : "${EB_ENVIRONMENT_NAME:?Set repository variable EB_ENVIRONMENT_NAME}"
+          : "${SHARED_ALB_ARN:?Set shared ALB ARN in workflow env}"
+          : "${OIDC_CLIENT_ID:?Set repository secret OIDC_CLIENT_ID}"
+          : "${OIDC_CLIENT_SECRET:?Set repository secret OIDC_CLIENT_SECRET}"
+      - name: Render Elastic Beanstalk extensions
+        run: |
+          sed \
+            -e "s|__SHARED_ALB_ARN__|${SHARED_ALB_ARN}|g" \
+            ".ebextensions/10-network-and-domain.config.template" \
+            > ".ebextensions/10-network-and-domain.config"
+      - name: Initialize and ensure Elastic Beanstalk environment
+        run: |
+          eb init "$EB_APPLICATION_NAME" --platform "Docker running on 64bit Amazon Linux 2023" --region "$AWS_REGION"
+          ENV_COUNT=$(aws elasticbeanstalk describe-environments \
+            --application-name "$EB_APPLICATION_NAME" \
+            --environment-names "$EB_ENVIRONMENT_NAME" \
+            --query "length(Environments[?Status!='Terminated'])" \
+            --output text)
+          if [ "$ENV_COUNT" = "0" ]; then
+            echo "Elastic Beanstalk environment '${EB_ENVIRONMENT_NAME}' not found. Creating it..."
+            eb create "$EB_ENVIRONMENT_NAME" \
+              --elb-type application \
+              --shared-lb "$SHARED_ALB_ARN" \
+              --shared-lb-port 443 \
+              --sample \
+              --timeout 30
+          else
+            echo "Elastic Beanstalk environment '${EB_ENVIRONMENT_NAME}' already exists."
+          fi
+          aws elasticbeanstalk describe-environments \
+            --application-name "$EB_APPLICATION_NAME" \
+            --environment-names "$EB_ENVIRONMENT_NAME" \
+            --query "Environments[0].[EnvironmentName,Status,Health,EnvironmentId,CNAME]" \
+            --output table
+      - name: Deploy to Elastic Beanstalk
+        run: |
+          eb deploy "$EB_ENVIRONMENT_NAME" --staged --timeout 30
+      - name: Configure shared ALB listener rule with OIDC auth
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import subprocess
+          import tempfile
+
+          EB_APPLICATION_NAME = os.environ["EB_APPLICATION_NAME"]
+          EB_ENVIRONMENT_NAME = os.environ["EB_ENVIRONMENT_NAME"]
+          SHARED_ALB_ARN = os.environ["SHARED_ALB_ARN"]
+          OIDC_CLIENT_ID = os.environ["OIDC_CLIENT_ID"]
+          OIDC_CLIENT_SECRET = os.environ["OIDC_CLIENT_SECRET"]
+          DESIRED_HOST_PATTERN = "coast-to-coast-challenge*.*"
+
+          def aws_json(args: list[str]) -> dict:
+              out = subprocess.check_output(["aws", *args], text=True)
+              return json.loads(out)
+
+          envs = aws_json(
+              [
+                  "elasticbeanstalk",
+                  "describe-environments",
+                  "--application-name",
+                  EB_APPLICATION_NAME,
+                  "--environment-names",
+                  EB_ENVIRONMENT_NAME,
+              ]
+          )["Environments"]
+          if not envs:
+              raise SystemExit("EB environment not found while configuring ALB rules.")
+          env_cname = envs[0]["CNAME"]
+
+          listeners = aws_json(
+              [
+                  "elbv2",
+                  "describe-listeners",
+                  "--load-balancer-arn",
+                  SHARED_ALB_ARN,
+              ]
+          )["Listeners"]
+          listener_arn = next(
+              (listener["ListenerArn"] for listener in listeners if listener.get("Port") == 443),
+              None,
+          )
+          if not listener_arn:
+              raise SystemExit("No HTTPS listener (443) found on shared ALB.")
+
+          rules = aws_json(
+              ["elbv2", "describe-rules", "--listener-arn", listener_arn]
+          )["Rules"]
+
+          def host_values(rule: dict) -> list[str]:
+              values: list[str] = []
+              for cond in rule.get("Conditions", []):
+                  if cond.get("Field") == "host-header":
+                      values.extend(cond.get("HostHeaderConfig", {}).get("Values", []))
+              return values
+
+          matching_rules: list[dict] = []
+          for rule in rules:
+              if rule.get("IsDefault"):
+                  continue
+              hosts = host_values(rule)
+              if env_cname in hosts or DESIRED_HOST_PATTERN in hosts:
+                  matching_rules.append(rule)
+
+          target_rule = next(
+              (rule for rule in matching_rules if env_cname in host_values(rule)),
+              None,
+          )
+          if target_rule is None:
+              target_rule = next(
+                  (
+                      rule
+                      for rule in matching_rules
+                      if DESIRED_HOST_PATTERN in host_values(rule)
+                  ),
+                  None,
+              )
+          if target_rule is None:
+              raise SystemExit(
+                  "Could not find target listener rule for the EB environment."
+              )
+
+          target_rule_arn = target_rule["RuleArn"]
+          for rule in matching_rules:
+              if rule["RuleArn"] == target_rule_arn:
+                  continue
+              if DESIRED_HOST_PATTERN in host_values(rule):
+                  subprocess.run(
+                      ["aws", "elbv2", "delete-rule", "--rule-arn", rule["RuleArn"]],
+                      check=True,
+                  )
+
+          forward_action = next(
+              (action for action in target_rule.get("Actions", []) if action.get("Type") == "forward"),
+              None,
+          )
+          if forward_action is None:
+              raise SystemExit("Could not find forward action in EB-managed listener rule.")
+
+          target_group_arn = forward_action.get("TargetGroupArn")
+          if not target_group_arn:
+              tg = forward_action.get("ForwardConfig", {}).get("TargetGroups", [])
+              if tg:
+                  target_group_arn = tg[0].get("TargetGroupArn")
+          if not target_group_arn:
+              raise SystemExit("Could not resolve target group ARN from EB-managed listener rule.")
+
+          conditions = [
+              {
+                  "Field": "host-header",
+                  "HostHeaderConfig": {"Values": [DESIRED_HOST_PATTERN]},
+              },
+          ]
+
+          actions = [
+              {
+                  "Type": "authenticate-oidc",
+                  "Order": 1,
+                  "AuthenticateOidcConfig": {
+                      "Issuer": "https://accounts.google.com",
+                      "AuthorizationEndpoint": "https://accounts.google.com/o/oauth2/v2/auth",
+                      "TokenEndpoint": "https://oauth2.googleapis.com/token",
+                      "UserInfoEndpoint": "https://openidconnect.googleapis.com/v1/userinfo",
+                      "ClientId": OIDC_CLIENT_ID,
+                      "ClientSecret": OIDC_CLIENT_SECRET,
+                      "OnUnauthenticatedRequest": "authenticate",
+                      "Scope": "openid email profile",
+                  },
+              },
+              {
+                  "Type": "forward",
+                  "Order": 2,
+                  "TargetGroupArn": target_group_arn,
+              },
+          ]
+
+          with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as conditions_file:
+              json.dump(conditions, conditions_file)
+              conditions_path = conditions_file.name
+          with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as actions_file:
+              json.dump(actions, actions_file)
+              actions_path = actions_file.name
+
+          subprocess.run(
+              [
+                  "aws",
+                  "elbv2",
+                  "modify-rule",
+                  "--rule-arn",
+                  target_rule["RuleArn"],
+                  "--conditions",
+                  f"file://{conditions_path}",
+                  "--actions",
+                  f"file://{actions_path}",
+              ],
+              check=True,
+          )
+          print("Updated shared ALB listener rule with coast-to-coast-challenge host pattern and OIDC auth.")
+          PY

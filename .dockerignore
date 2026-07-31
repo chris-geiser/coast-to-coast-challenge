@@ -1,0 +1,9 @@
+.git
+.github
+.ebextensions
+.elasticbeanstalk
+app
+sheet-backend
+specs
+*.md
+.DS_Store

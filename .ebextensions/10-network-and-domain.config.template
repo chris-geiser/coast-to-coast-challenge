@@ -1,0 +1,5 @@
+option_settings:
+  aws:elbv2:loadbalancer:
+    SharedLoadBalancer: "__SHARED_ALB_ARN__"
+  aws:elbv2:listener:443:
+    rules: default

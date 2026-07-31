@@ -15,3 +15,7 @@ npm-debug.log*
 # Editor cruft
 .vscode/
 *.swp
+
+# Rendered from the .template at deploy time
+.ebextensions/10-network-and-domain.config
+.elasticbeanstalk/logs/

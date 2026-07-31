@@ -40,6 +40,20 @@ Full design package is in [specs/](specs/). This README covers how to stand it u
 2. Execute as: **User accessing the web app**. Who has access: **your Workspace domain** (this is the gate).
 3. Open the URL while signed in to your work account. You should see the map at mile zero.
 
+## Hosting
+
+The `docs/` prototype is served at `https://coast-to-coast-challenge.app.ignite-reading.com/`, behind Google sign-in, on the same shared infrastructure as the BTS dashboard. Pushing to `main` builds `docs/` into an nginx image and deploys it to Elastic Beanstalk; the shared `ignite-apps` load balancer terminates TLS and enforces Google OIDC before any request reaches the site.
+
+| File | Role |
+|------|------|
+| `Dockerfile` | Copies `docs/` into `nginx:1.27-alpine`. |
+| `nginx.conf` | Serves the site on port 80 and answers `/health` for the load balancer. |
+| `.ebextensions/` | Health check settings and the shared load balancer attachment (the `.template` is rendered during deploy). |
+| `.elasticbeanstalk/config.yml` | Application and environment names for the EB CLI. |
+| `.github/workflows/cd.yml` | Deploys on push to `main` and applies the OIDC rule to the shared load balancer. |
+
+The Google Sheet backend is unchanged and still reached over `POST` from the browser, so it works the same from this domain as it did from GitHub Pages.
+
 ## Validate
 
 Run the checks in [specs/quickstart.md](specs/quickstart.md). Quick start for a demo: run `seedDemoData(120)` in `Tests.gs` to spread entries across people and dates so the dot moves, then `runTests()` to confirm the math, then `clearEntries()` before launch.
