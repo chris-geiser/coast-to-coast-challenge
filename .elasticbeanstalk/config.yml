@@ -1,0 +1,9 @@
+branch-defaults:
+  main:
+    environment: coast-to-coast-challenge-prod
+global:
+  application_name: coast-to-coast-challenge
+  default_region: us-east-1
+  platform_name: Docker running on 64bit Amazon Linux 2023
+  platform_version: null
+  workspace_type: Application

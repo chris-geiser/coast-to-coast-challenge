@@ -1,0 +1,8 @@
+.git
+.gitignore
+.github
+app
+sheet-backend
+specs
+*.md
+.DS_Store
